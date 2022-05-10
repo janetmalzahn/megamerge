@@ -1,3 +1,89 @@
+/***
+_version 1.0_ 
+
+megamerge
+===== 
+
+__megamerge__ performs 10 sequential merges to exhaustively link data with names and additional variables.
+
+Syntax
+------ 
+
+> __megamerge__ _varlist_ using _filename_ , replace(_varlist_) [ _options_]
+
+| _option_          |  _Description_          |
+|:------------------------|:----------------------------------------------|
+| replace(_varlist_)     | retains variables of interest from using data   |
+| trywithout(_var_) | try merge without included variable  |
+
+
+Description
+-----------
+
+megamerge performs sequential 1:1 merges in decreasing orders of specificity to match record with names. Megamerge requires that both master and using data have the variables first, last, middle, and suffix. 
+
+Options
+-------
+
+replace(_varlist_) ensures that the variables you are trying to merge from the using to the master do not get replaced. For example, if the user wants to merge in "id" from using, they must use the replace(id) option.
+
+trywithout(_var_) runs one iteration of the merge without the specificed variable. The variable given the this option must be contained in the varlist given originally to megamerge. 
+
+Remarks
+-------
+
+Stuff about how megamerge works
+
+Example(s)
+----------
+
+    performs a megamerge of data in memory to data2 on name vars, state, and dist to get pop
+
+        . megamerge state dist using data2, replace(pop)
+
+    performs same megamerge, but tries a round without the district variable
+
+        . megamerge state dist using data2, replace(pop) trywithout(dist)
+
+Stored results
+--------------
+
+describe the Scalars, Matrices, Macros, stored by __XXX__, for example:
+
+### Scalars
+
+> __r(level)__: explain what the scalar does 
+
+### Matrices
+
+> __r(table)__: explain what it includes
+
+Functions
+
+Author
+------
+
+Janet Malzahn  
+Stanford Institute for Economic Policy Research    
+jmalzahn@stanford.edu   
+
+License
+-------
+
+Specify the license of the software
+
+References
+----------
+
+Janet Malzahn (2022), [Megamerge](https://github.com/haghish/markdoc/)
+
+- - -
+
+This help file was dynamically produced by 
+[MarkDoc Literate Programming package](http://www.haghish.com/markdoc/) 
+***/
+
+
 capture program drop megamerge
 program define megamerge
 
@@ -639,3 +725,6 @@ tab _merge
 
 end
 	
+
+
+
