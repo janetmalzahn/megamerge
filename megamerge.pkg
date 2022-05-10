@@ -1,0 +1,10 @@
+v 1.0
+d 'MEGAMERGE': megamerge
+d 
+d multi-phase merge for 1:1 matching data with names
+d 
+d Distribution-Date:   20220510
+d License: MIT
+d 
+F megamerge.ado
+F megamerge.sthlp

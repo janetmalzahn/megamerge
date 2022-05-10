@@ -1,0 +1,8 @@
+v 1.0
+d Materials by Janet Malzahn
+d Stanford Institute for Economic Policy Research
+d jmalzahn@stanford.edu
+
+d 'megamerge': multi-phase merge for 1:1 matching data with names
+
+p megamerge
