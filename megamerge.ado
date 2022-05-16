@@ -25,7 +25,7 @@ megamerge performs sequential 1:1 merges in decreasing orders of specificity to 
 Options
 -------
 
-replace(_varlist_) ensures that the variables you are trying to merge from the using to the master do not get replaced. For example, if the user wants to merge in "id" from using, they must use the replace(id) option.
+replace(_varlist_) ensures that the variables the user wants to merge from the using to the master do not get replaced. For example, if the user wants to merge in "id" from using, they must use the replace(id) option. This option is required.
 
 trywithout(_var_) runs one iteration of the merge without the specificed variable. The variable given the this option must be contained in the varlist given originally to megamerge. 
 
@@ -98,6 +98,11 @@ qui{
 ** master = master dataset
 ** using = using dataset
 ** varlist = varlist for merge 
+
+******************************************
+* Make sure replace option is specified
+******************************************
+assert("`replace'" != "")
 
 *****************************
 * Generate initial and lasts
@@ -1200,7 +1205,7 @@ foreach item in `trywithout'{
 	* merge with all variables but middle name
 	merge 1:1 `merge_varlist' using `using_nodups'
 
-	merge_all
+	tempfile merge_all
 	save `merge_all', replace
 
 	preserve
