@@ -93,6 +93,7 @@ version 15.1
 * define the syntax
 syntax varlist using/ [,replace(string) trywithout(string)]
 
+qui{
 * arguments: master using varlist
 ** master = master dataset
 ** using = using dataset
@@ -167,45 +168,6 @@ forvalues x = 1/`n'{
 tempfile using_data
 save `using_data'
 
-/*
-**************************
-* Get rid of duplicates 
-**************************
-
-use `using_data', clear
-
-* tag initial duplicates in using
-duplicates tag `varlist' last_last first, gen(dup)
-drop if dup == 0 // keep only duplicates
-drop dup
-tempfile first_duplicates_using // create tempfile with duplicates
-save `first_duplicates_using' // save tempfile with duplicates
-
-* save using without the duplicates
-use `using_data'
-duplicates tag `varlist' last_last first, gen(dup) // tag duplciates
-drop if dup > 0 // keep only unique observations
-drop dup
-tempfile using_nodups // create tempfile without the duplicates
-save `using_nodups'
-
-* use duplicates
-use `master', clear
-
-* save dataset with extra duplicates
-duplicates tag `varlist' last_last first, gen(dup)
-tab dup
-drop if dup == 0
-drop dup
-tempfile first_duplicates_master
-save `first_duplicates_master'
-
-* get master without duplicates 
-use `master'
-duplicates tag `varlist' last_last first, gen(dup)
-drop if dup != 0
-drop dup
-*/
 
 ************************************************************************
 * Zeroth Pass: merge with all information
@@ -369,7 +331,6 @@ restore
 
 drop if dup != 0
 drop dup
-tempfile using_nodups
 save `using_nodups', replace // save file without duplicates
 
 *------------------------------------------
@@ -444,7 +405,6 @@ restore
 
 drop if dup != 0
 drop dup
-tempfile using_nodups
 save `using_nodups', replace // save file without duplicates
 
 *------------------------------------------
@@ -701,7 +661,7 @@ save `merge_all'
 preserve
 	* append matches to prior matches
 	keep if _merge == 3
-	capture gen merge_code = 5
+	capture gen merge_code = 6
 	append using `merge_matched'
 	save `merge_matched', replace
 	
@@ -846,7 +806,7 @@ save `merge_all'
 preserve
 	* append matches to prior matches
 	keep if _merge == 3
-	capture gen merge_code = 6
+	capture gen merge_code = 7
 	append using `merge_matched'
 	save `merge_matched', replace
 	
@@ -920,7 +880,7 @@ save `merge_all'
 preserve
 	* append matches to prior matches
 	keep if _merge == 3
-	capture gen merge_code = 7
+	capture gen merge_code = 8
 	append using `merge_matched'
 	save `merge_matched', replace
 	
@@ -991,7 +951,7 @@ merge 1:1 `merge_varlist' using `using_nodups'
 preserve
 	* append matches to prior matches
 	keep if _merge == 3
-	gen merge_code = 8
+	gen merge_code = 9
 	append using `merge_matched'
 	save `merge_matched', replace
 	
@@ -1065,7 +1025,7 @@ save `merge_all'
 preserve
 	* append matches to prior matches
 	keep if _merge == 3
-	capture gen merge_code = 9
+	capture gen merge_code = 10
 	append using `merge_matched'
 	save `merge_matched', replace
 	
@@ -1081,6 +1041,8 @@ restore
 	capture drop _merge
 	capture drop `replace'
 	save `master_merge_unmatched', replace
+	
+/*
 	
 ***************************************************************
 * Eleventh Pass: fuzzy merge on last (with initial and all covs)
@@ -1160,7 +1122,7 @@ save `fuzzy_joined'
 *--------------------------------------------
 drop idusing idmaster last_using last_master last_dist // drop all the variables
 capture gen _merge = 3 // make merge variable
-capture gen merge_code = 10 // make a merge code
+capture gen merge_code = 11 // make a merge code
 * append merge matched and save
 append using `merge_matched'
 save `merge_matched', replace
@@ -1181,12 +1143,14 @@ capture drop idmaster _merge last_using // drop created variables
 capture rename last_master last // rename back to the appropriate variable
 capture drop `replace'
 save `master_merge_unmatched', replace
+*/
 
 ******************************************************
 * Twelth Pass: trywithout each variable
 ******************************************************
 local merge_varlist `varlist' last
 
+if "`trywithout'" != "" {
 foreach item in `trywithout'{
 	local tempvarlist : list varlist - item
 	local merge_varlist `tempvarlist' last_last first
@@ -1236,13 +1200,13 @@ foreach item in `trywithout'{
 	* merge with all variables but middle name
 	merge 1:1 `merge_varlist' using `using_nodups'
 
-	tempfile merge_all
-	save `merge_all'
+	merge_all
+	save `merge_all', replace
 
 	preserve
 		* append matches to prior matches
 		keep if _merge == 3
-		capture gen merge_code = 11
+		capture gen merge_code = 12
 		append using `merge_matched'
 		save `merge_matched', replace
 		
@@ -1258,6 +1222,7 @@ foreach item in `trywithout'{
 		capture drop _merge
 		capture drop `replace'
 		save `master_merge_unmatched', replace
+}
 }
 
 *************************************************
@@ -1319,7 +1284,8 @@ label define match_code  1 "Not matched from master" ///
 					     2 "Not matched from using" ///
 					     3 "Matched"
 label values matched match_code
-						 
+
+}					 
 
 tab merge_code
 tab matched
