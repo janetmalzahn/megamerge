@@ -25,9 +25,12 @@ megamerge performs sequential 1:1 merges in decreasing orders of specificity to 
 Options
 -------
 
-replace(_varlist_) ensures that the variables the user wants to merge from the using to the master do not get replaced. For example, if the user wants to merge in "id" from using, they must use the replace(id) option. This option is required.
+replace(_varlist_) ensures that the variables the user wants to merge from the using to the master do not get replaced. For example, if the user wants to merge in "id" from using, they must use the replace(id) option. This option is _required_.
 
 trywithout(_var_) runs one iteration of the merge without the specificed variable. The variable given the this option must be contained in the varlist given originally to megamerge. 
+
+Merge Codes
+-----------
 
 Remarks
 -------
@@ -105,13 +108,14 @@ qui{
 assert("`replace'" != "")
 
 *****************************
-* Generate initial and lasts
+* Preclean Master
 *****************************
 
 * make all name info uppercase
 * make upper case
 foreach var of varlist first middle last suffix {
 	replace `var' = upper(`var')
+	replace `var' = subinstr(`var', ".", "", .)
 }
 
 * initial duplicates for master
@@ -147,12 +151,16 @@ forvalues x = 1/`n'{
 tempfile master
 save `master'
 
+**********************************
+* Preclean Using
+**********************************
+
 use `using', clear
 
-* make all variables uppercase
-* make upper case
+* make all variables uppercase and drop periods
 foreach var of varlist first middle last suffix {
 	replace `var' = upper(`var')
+	replace `var' = subinstr(`var', ".", "", .)
 }
 
 * get first initial
@@ -474,10 +482,10 @@ restore
 	save `master_merge_unmatched', replace
 	
 ******************************************************
-* Fourth Pass: merge with last_last and first
+* Fourth Pass: merge with first and last
 ******************************************************
 
-local merge_varlist `varlist' first last_last
+local merge_varlist `varlist' first last
 
 *-----------------------------------------
 * separate out duplicates for the using
@@ -546,12 +554,12 @@ restore
 	capture drop _merge
 	capture drop `replace'
 	save `master_merge_unmatched', replace
-
+	
 ******************************************************
-* Fifth Pass: merge with last1 and first
+* Fifth Pass: merge with last_last and first
 ******************************************************
 
-local merge_varlist `varlist' first last1
+local merge_varlist `varlist' first last_last
 
 *-----------------------------------------
 * separate out duplicates for the using
@@ -620,12 +628,12 @@ restore
 	capture drop _merge
 	capture drop `replace'
 	save `master_merge_unmatched', replace
-	
+
 ******************************************************
-* Sixth Pass: merge with last and initial
+* Sixth Pass: merge with last1 and first
 ******************************************************
 
-local merge_varlist `varlist' initial last
+local merge_varlist `varlist' first last1
 
 *-----------------------------------------
 * separate out duplicates for the using
@@ -694,10 +702,84 @@ restore
 	capture drop _merge
 	capture drop `replace'
 	save `master_merge_unmatched', replace
+	
+******************************************************
+* Seventh Pass: merge with last and initial
+******************************************************
+
+local merge_varlist `varlist' initial last
+
+*-----------------------------------------
+* separate out duplicates for the using
+*-----------------------------------------
+use `using_merge_unmatched'
+* add previous duplicates dropped because they might be useful
+append using `all_duplicates_using'
+capture drop dup // drop dup previously generated
+
+* tag duplicates in using
+duplicates tag `merge_varlist', gen(dup)
+preserve // get dataset with just duplicates
+	keep if dup > 0 // separate out duplicates
+	save `all_duplicates_using', replace
+restore
+
+drop if dup != 0
+drop dup
+save `using_nodups', replace // save file without duplicates
+
+*------------------------------------------
+* separate out duplicates for the master
+*------------------------------------------
+
+* tag initial duplicates in master
+use `master_merge_unmatched'
+* add previous duplicates dropped because they might be useful
+append using `all_duplicates_master'
+capture drop dup // drop dup previously generated
+
+* tag initial duplicates in master
+duplicates tag `merge_varlist', gen(dup)
+preserve // get dataset with just duplicates
+	keep if dup > 0 // separate out duplicates
+	save `all_duplicates_master', replace
+restore
+
+drop if dup != 0
+drop dup
+
+*-----------------------------------------------
+* merge variables + first + last + middle_init
+*-----------------------------------------------
+* merge with all variables but middle name
+merge 1:1 `merge_varlist' using `using_nodups'
+
+tempfile merge_all
+save `merge_all'
+
+preserve
+	* append matches to prior matches
+	keep if _merge == 3
+	capture gen merge_code = 7
+	append using `merge_matched'
+	save `merge_matched', replace
+	
+restore, preserve
+	* save unmatched from using
+	keep if _merge == 2
+	capture drop _merge
+	save `using_merge_unmatched', replace
+	
+restore
+	* save unmatched from master
+	keep if _merge == 1
+	capture drop _merge
+	capture drop `replace'
+	save `master_merge_unmatched', replace
 
 	
 ******************************************************
-* Seventh Pass: merge with last and nicknames (initial)
+* Eighth Pass: merge with last and nicknames (initial)
 ******************************************************
 
 local merge_varlist `varlist' last fake_first
@@ -823,7 +905,7 @@ save `merge_all'
 preserve
 	* append matches to prior matches
 	keep if _merge == 3
-	capture gen merge_code = 7
+	capture gen merge_code = 8
 	append using `merge_matched'
 	save `merge_matched', replace
 	
@@ -841,7 +923,7 @@ restore
 	save `master_merge_unmatched', replace
 	
 ******************************************************
-* Eight Pass: merge with hyphen_last + initial
+* Ninth Pass: merge with hyphen_last + initial
 ******************************************************
 
 local merge_varlist `varlist' hyphen_last initial
@@ -897,7 +979,7 @@ save `merge_all'
 preserve
 	* append matches to prior matches
 	keep if _merge == 3
-	capture gen merge_code = 8
+	capture gen merge_code = 9
 	append using `merge_matched'
 	save `merge_matched', replace
 	
@@ -915,7 +997,7 @@ restore
 	save `master_merge_unmatched', replace
 	
 ******************************************************
-* Ninth Pass: merge with hyphen_first + initial
+* Tenth Pass: merge with hyphen_first + initial
 ******************************************************
 
 local merge_varlist `varlist' hyphen1 initial
@@ -968,7 +1050,7 @@ merge 1:1 `merge_varlist' using `using_nodups'
 preserve
 	* append matches to prior matches
 	keep if _merge == 3
-	gen merge_code = 9
+	gen merge_code = 10
 	append using `merge_matched'
 	save `merge_matched', replace
 	
@@ -987,7 +1069,7 @@ restore
 	
 
 ******************************************************
-* Tenth Pass: merge with just nohyphen_last
+* Eleventh Pass: merge with just nohyphen_last
 ******************************************************
 
 local merge_varlist `varlist' first nohyphen_last
@@ -1051,7 +1133,7 @@ save `merge_all'
 preserve
 	* append matches to prior matches
 	keep if _merge == 3
-	capture gen merge_code = 10
+	capture gen merge_code = 11
 	append using `merge_matched'
 	save `merge_matched', replace
 	
@@ -1069,7 +1151,7 @@ restore
 	save `master_merge_unmatched', replace
 	
 *****************************************************
-* Eleventh Pass: Merge Appended Last with Middle
+* Twelfth Pass: Merge Appended MiddleLast
 *****************************************************
 
 local merge_varlist `varlist' first appended_last
@@ -1131,7 +1213,87 @@ save `merge_all'
 preserve
 	* append matches to prior matches
 	keep if _merge == 3
-	capture gen merge_code = 11
+	capture gen merge_code = 12
+	append using `merge_matched'
+	save `merge_matched', replace
+	
+restore, preserve
+	* save unmatched from using
+	keep if _merge == 2
+	capture drop _merge
+	save `using_merge_unmatched', replace
+	
+restore
+	* save unmatched from master
+	keep if _merge == 1
+	capture drop _merge
+	capture drop `replace'
+	save `master_merge_unmatched', replace
+	
+*****************************************************
+* Thirteenth Pass: Merge Appended LastMiddle
+*****************************************************
+
+local merge_varlist `varlist' first appended_lastmiddle
+
+*-----------------------------------------
+* separate out duplicates for the using
+*-----------------------------------------
+use `using_merge_unmatched'
+* add previous duplicates dropped because they might be useful
+append using `all_duplicates_using'
+capture drop dup // drop dup previously generated
+
+* make appended last of middle + last
+gen appended_lastmiddle = cond(length(middle)>2,last+middle,last)
+
+* tag duplicates in using
+duplicates tag `merge_varlist', gen(dup)
+preserve // get dataset with just duplicates
+	keep if dup > 0 // separate out duplicates
+	save `all_duplicates_using', replace
+restore
+
+drop if dup != 0
+drop dup
+save `using_nodups', replace // save file without duplicates
+
+*------------------------------------------
+* separate out duplicates for the master
+*------------------------------------------
+
+* tag initial duplicates in master
+use `master_merge_unmatched'
+* add previous duplicates dropped because they might be useful
+append using `all_duplicates_master'
+capture drop dup // drop dup previously generated
+
+* make appended last
+gen appended_lastmiddle = cond(length(middle)>2,last+middle,last)
+
+* tag initial duplicates in master
+duplicates tag `merge_varlist', gen(dup)
+preserve // get dataset with just duplicates
+	keep if dup > 0 // separate out duplicates
+	save `all_duplicates_master', replace
+restore
+
+drop if dup != 0
+drop dup
+
+*-----------------------------------------------
+* merge variables + appended_last
+*-----------------------------------------------
+* merge with all variables but middle name
+merge 1:1 `merge_varlist' using `using_nodups'
+
+tempfile merge_all
+save `merge_all'
+
+preserve
+	* append matches to prior matches
+	keep if _merge == 3
+	capture gen merge_code = 13
 	append using `merge_matched'
 	save `merge_matched', replace
 	
@@ -1149,7 +1311,7 @@ restore
 	save `master_merge_unmatched', replace
 
 ******************************************************
-* Twelth Pass: merge with just last
+* Fourteenth Pass: merge with just last
 ******************************************************
 
 local merge_varlist `varlist' last
@@ -1205,7 +1367,7 @@ save `merge_all'
 preserve
 	* append matches to prior matches
 	keep if _merge == 3
-	capture gen merge_code = 12
+	capture gen merge_code = 14
 	append using `merge_matched'
 	save `merge_matched', replace
 	
@@ -1222,111 +1384,9 @@ restore
 	capture drop `replace'
 	save `master_merge_unmatched', replace
 	
-/*
-	
-***************************************************************
-* Eleventh Pass: fuzzy merge on last (with initial and all covs)
-***************************************************************
-
-local merge_varlist `varlist' first
-
-*------------------------------------------
-* prep using for the joinby
-*------------------------------------------
-* get just using data
-use `using_merge_unmatched'
-append using `all_duplicates_using'
-capture drop dup // drop dup previously generated
-
-* tag duplicates in using
-duplicates tag `merge_varlist' last, gen(dup)
-preserve // get dataset with just duplicates
-	keep if dup > 0 // separate out duplicates
-	save `all_duplicates_using', replace
-restore
-
-drop if dup != 0
-drop dup
-generate idusing = _n // generate a using id
-rename last last_using // rename last so it's not lost or replaced in merge
-save `using_nodups', replace // save file without duplicates
-
-*-------------------------------------------
-* prep master for the joinby
-*-------------------------------------------
-* tag initial duplicates in master
-use `master_merge_unmatched'
-* add previous duplicates dropped because they might be useful
-append using `all_duplicates_master'
-capture drop dup // drop dup previously generated
-
-* tag initial duplicates in master
-duplicates tag `merge_varlist', gen(dup)
-preserve // get dataset with just duplicates
-	keep if dup > 0 // separate out duplicates
-	save `all_duplicates_master', replace
-restore
-
-drop if dup != 0
-drop dup
-generate idmaster = _n // generate a master id
-rename last last_master // rename last so it's not lost or replaced in merge
-
-* save tempfile of master without duplicates
-tempfile master_nodups
-save `master_nodups' // save
-
-*-------------------------------------------
-* joinby varlist
-*-------------------------------------------
-* joinby to get all combinations of varlist
-joinby `varlist' initial using `using_nodups'
-
-* get string distance btw last names from last_using and last_master
-ustrdist last_using last_master, gen(last_dist)
-
-* keep if string distance is low enough that it could be a typo
-keep if last_dist < 4
-
-* sort last_distance so lowest distances are first
-sort `varlist' last_master initial last_dist
-
-* keep greatest first in group
-by `varlist' last_master initial: keep if _n == 1
-
-tempfile fuzzy_joined
-save `fuzzy_joined'
-
-*--------------------------------------------
-* save files
-*--------------------------------------------
-drop idusing idmaster last_using last_master last_dist // drop all the variables
-capture gen _merge = 3 // make merge variable
-capture gen merge_code = 11 // make a merge code
-* append merge matched and save
-append using `merge_matched'
-save `merge_matched', replace
-
-* get using unmatched
-use `using_nodups'
-merge 1:1 idusing using `fuzzy_joined', keepusing(last_master)
-keep if _merge == 1
-capture drop idusing _merge last_master
-capture rename last_using last
-save `using_merge_unmatched', replace 
-
-* get master_unmatched
-use `master_nodups'
-merge 1:1 idmaster using `fuzzy_joined', keepusing(last_using) // merge on id_master
-keep if _merge == 1 // keep unmatched in master only
-capture drop idmaster _merge last_using // drop created variables
-capture rename last_master last // rename back to the appropriate variable
-capture drop `replace'
-save `master_merge_unmatched', replace
-*/
 
 ******************************************************
-* Thirteenth Pass: trywithout each variable
+* Fifteenth Pass: trywithout each variable
 ******************************************************
 local merge_varlist `varlist' last
 
@@ -1386,7 +1446,7 @@ foreach item in `trywithout'{
 	preserve
 		* append matches to prior matches
 		keep if _merge == 3
-		capture gen merge_code = 13
+		capture gen merge_code = 15
 		append using `merge_matched'
 		save `merge_matched', replace
 		
@@ -1445,16 +1505,18 @@ label define merge_labs  0 "0: all" ///
 						 1 "1: all - middle" ///
 						 2 "2: all - suffix" ///
 						 3 "3: vars + middle_init + first + last" ///
-						 4 "4: vars + lastlast + first" ///
-						 5 "5: vars + firstlast + first" ///
-						 6 "6: vars + last + initial" ///
-						 7 "7: vars + last + nickname" ///
-						 8 "8: vars + hyphen2 + initial" ///
-						 9 "9: vars + hypen1 + initial" ///
-						 10 "10: vars + nohyphen_last" ///
-						 11 "11: vars + middlelast" ///
-						 12 "12: vars + last" ///
-						 13 "13: vars - trywithout" ///
+						 4 "4: vars + first + last" // 
+						 5 "5: vars + lastlast + first" ///
+						 6 "6: vars + firstlast + first" ///
+						 7 "7: vars + last + initial" ///
+						 8 "8: vars + last + nickname" ///
+						 9 "9: vars + hyphen2 + initial" ///
+						 10 "10: vars + hypen1 + initial" ///
+						 11 "11: vars + nohyphen_last" ///
+						 12 "12: vars + middlelast" ///
+						 13 "13: vars + lastmiddle" ///
+						 14 "14: vars + last" ///
+						 15 "15: vars - trywithout" ///
 						 100 "100: unmatched from using" ///
 						 101 "101: omitted duplicate from using" ///
 						 200 "200: unmatched from master" ///
