@@ -1505,7 +1505,7 @@ label define merge_labs  0 "0: all" ///
 						 1 "1: all - middle" ///
 						 2 "2: all - suffix" ///
 						 3 "3: vars + middle_init + first + last" ///
-						 4 "4: vars + first + last" // 
+						 4 "4: vars + first + last" ///
 						 5 "5: vars + lastlast + first" ///
 						 6 "6: vars + firstlast + first" ///
 						 7 "7: vars + last + initial" ///
