@@ -4,7 +4,7 @@ _version 1.1_
 megamerge
 ===== 
 
-__megamerge__ performs 10 sequential merges to exhaustively link data with names and additional variables.
+__megamerge__ performs 15 1:1 merges sequentially to exhaustively link data with names and additional variables. 
 
 Syntax
 ------ 
@@ -20,17 +20,42 @@ Syntax
 Description
 -----------
 
-megamerge performs sequential 1:1 merges in decreasing orders of specificity to match record with names. Megamerge requires that both master and using data have the variables first, last, middle, and suffix. 
+megamerge performs sequential 1:1 merges in decreasing orders of specificity to match record with names. Megamerge requires that both master and using data have the variables first, last, middle, and suffix.
+
+Each merge is in decreasing levels of specificity, so observations are matched on the most information avaiable. Since the merges are 1:1, observations that are not unique merge variables in the master and the using are omitted at each merge but appended to the ummatched data for the next merge. 
 
 Options
 -------
 
-replace(_varlist_) ensures that the variables the user wants to merge from the using to the master do not get replaced. For example, if the user wants to merge in "id" from using, they must use the replace(id) option. This option is _required_.
+replace(_varlist_) requires the user to specify which variables they want to merge in from the using dataset, ensuring that the variables the user wants to merge from the using to the master do not get replaced. For example, if the user wants to merge in "id" from using, they must use the replace(id) option. This option is _required_.
 
 trywithout(_var_) runs one iteration of the merge without the specificed variable. The variable given the this option must be contained in the varlist given originally to megamerge. 
 
 Merge Codes
 -----------
+
+| **merge code** | **explanation**                                                           |
+|----------------|---------------------------------------------------------------------------|
+| 0              | merge vars \+ first \+ last \+ middle\+ suffix                            |
+| 1              | merge vars \+ first \+ last \+ suffix                                     |
+| 2              | merge vars \+ first \+ last \+ middle                                     |
+| 3              | merge vars \+ first \+ last \+ middle initial                             |
+| 4              | merge vars \+ first \+ last                                               |
+| 5              | merge vars \+ last word of last name \+ first                             |
+| 6              | merge vars \+ first word of last name \+ first                            |
+| 7              | merge vars \+ last \+ initial                                             |
+| 8              | merge vars \+ last \+ first names standardized for common nicknames       |
+| 9              | merge vars \+ last \+ second part of hyphen \+ first initial              |
+| 10             | merge vars \+ first part of hyphen \+ first initial                       |
+| 11             | merge vars \+ last name without any spaces or hyphens                     |
+| 12             | merge vars \+ middle appended to last name \(no spaces\), middlelast      |
+| 13             | merge vars \+ ast name appended to middle\(no spaces\), lastmiddle        |
+| 14             | merge vars \+ last                                                        |
+| 15             | merge vars except for var specified in trywithout option \+ last \+ first |
+| 100            | unmatched observations from master data                                   |
+| 101            | omitted duplicate observations from master data (unmatched)               |
+| 200            | unmatched observations from using data                                    |
+| 201            | omitted duplicate observations from using data (unmatched)                |
 
 Remarks
 -------
@@ -1388,12 +1413,10 @@ restore
 ******************************************************
 * Fifteenth Pass: trywithout each variable
 ******************************************************
-local merge_varlist `varlist' last
-
 if "`trywithout'" != "" {
 foreach item in `trywithout'{
 	local tempvarlist : list varlist - item
-	local merge_varlist `tempvarlist' last_last first
+	local merge_varlist `tempvarlist' last first
 	
 	*-----------------------------------------
 	* separate out duplicates for the using
@@ -1470,22 +1493,22 @@ foreach item in `trywithout'{
 *************************************************
 * generate merge_code for using unmatched
 use `using_merge_unmatched'
-capture gen merge_code = 100
+capture gen merge_code = 200
 save `using_merge_unmatched', replace
 
 * generate merge_code for master unmatched
 use `master_merge_unmatched'
-capture gen merge_code = 200
+capture gen merge_code = 100
 save `master_merge_unmatched', replace
 
 * generate merge_code for using duplicates
 use `all_duplicates_using'
-capture gen merge_code = 101
+capture gen merge_code = 201
 save `all_duplicates_using', replace
 
 * generate merge_code for master duplicates
 use `all_duplicates_master'
-capture gen merge_code = 201
+capture gen merge_code = 101
 save `all_duplicates_master', replace
 
 append using `using_merge_unmatched'
@@ -1497,8 +1520,8 @@ append using `merge_matched'
 * Label merge_code
 ***********************************************
 
-gen matched = 1 if merge_code >= 200
-replace matched = 2 if merge_code >= 100 & merge_code < 200
+gen matched = 1 if merge_code < 200 & merge_code >= 100
+replace matched = 2 if merge_code >= 200  
 replace matched = 3 if merge_code < 20
 
 label define merge_labs  0 "0: all" /// 
@@ -1512,15 +1535,15 @@ label define merge_labs  0 "0: all" ///
 						 8 "8: vars + last + nickname" ///
 						 9 "9: vars + hyphen2 + initial" ///
 						 10 "10: vars + hypen1 + initial" ///
-						 11 "11: vars + nohyphen_last" ///
+						 11 "11: vars + last smooshed" ///
 						 12 "12: vars + middlelast" ///
 						 13 "13: vars + lastmiddle" ///
 						 14 "14: vars + last" ///
 						 15 "15: vars - trywithout" ///
-						 100 "100: unmatched from using" ///
-						 101 "101: omitted duplicate from using" ///
-						 200 "200: unmatched from master" ///
-						 201 "201: omitted duplicate from master"
+						 200 "200: unmatched from using" ///
+						 201 "201: omitted duplicate from using" ///
+						 100 "100: unmatched from master" ///
+						 101 "101: omitted duplicate from master"
 label values merge_code merge_labs
 
 label define match_code  1 "Not matched from master" ///
