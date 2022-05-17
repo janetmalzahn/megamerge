@@ -1454,7 +1454,6 @@ label define merge_labs  0 "0: all" ///
 						 10 "10: vars + nohyphen_last" ///
 						 11 "11: vars + middlelast" ///
 						 12 "12: vars + last" ///
-						 11 "11: vars + first + fuzzy last" ///
 						 13 "13: vars - trywithout" ///
 						 100 "100: unmatched from using" ///
 						 101 "101: omitted duplicate from using" ///
