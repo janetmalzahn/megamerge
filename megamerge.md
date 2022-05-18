@@ -79,7 +79,7 @@ Merge Codes
   12            merge vars + middle appended to last name (no spaces),
                 middlelast
 
-  13            merge vars + ast name appended to middle(no spaces),
+  13            merge vars + last name appended to middle (no spaces),
                 lastmiddle
 
   14            merge vars + last
@@ -94,14 +94,22 @@ Merge Codes
 
   200           unmatched observations from using data
 
-  201           omitted duplicate observations from using data
-                (unmatched).
+  201           omitted duplicate observations from using data (unmatched)
   ------------------------------------------------------------------------
 
 Remarks
 -------
 
-Stuff about how megamerge works
+Each phase of megamerge consists of the following steps 1. Specify list
+of variables to be used in the merge 2. Append previously omitted
+duplicates from master and using to unmatched observations from master
+and using respectively. 3. Generate new variables for certain merges 4.
+Save and separte duplicate obsevations from master and using in a
+separate dataset. 5. Perform a 1:1 merge of master to using on the
+variable list for that merge 6. Append matched observations with a
+merge\_code to indicate which merge a match came from to prior matched
+observations. 7. Separate out observations that were not matched from
+master and using for use in the next merge.
 
 Example(s)
 ----------
@@ -113,21 +121,6 @@ Example(s)
     performs same megamerge, but tries a round without the district variable
 
             . megamerge state dist using data2, replace(pop) trywithout(dist)
-
-Stored results
---------------
-
-describe the Scalars, Matrices, Macros, stored by **XXX**, for example:
-
-### Scalars
-
-> **r(level)**: explain what the scalar does
-
-### Matrices
-
-> **r(table)**: explain what it includes
-
-Functions
 
 Author
 ------

@@ -36,22 +36,22 @@ Merge Codes
 
 | **merge code** | **explanation**                                                           |
 |----------------|---------------------------------------------------------------------------|
-| 0              | merge vars \+ first \+ last \+ middle\+ suffix                            |
-| 1              | merge vars \+ first \+ last \+ suffix                                     |
-| 2              | merge vars \+ first \+ last \+ middle                                     |
-| 3              | merge vars \+ first \+ last \+ middle initial                             |
-| 4              | merge vars \+ first \+ last                                               |
-| 5              | merge vars \+ last word of last name \+ first                             |
-| 6              | merge vars \+ first word of last name \+ first                            |
-| 7              | merge vars \+ last \+ initial                                             |
-| 8              | merge vars \+ last \+ first names standardized for common nicknames       |
-| 9              | merge vars \+ last \+ second part of hyphen \+ first initial              |
-| 10             | merge vars \+ first part of hyphen \+ first initial                       |
-| 11             | merge vars \+ last name without any spaces or hyphens                     |
-| 12             | merge vars \+ middle appended to last name \(no spaces\), middlelast      |
-| 13             | merge vars \+ ast name appended to middle\(no spaces\), lastmiddle        |
-| 14             | merge vars \+ last                                                        |
-| 15             | merge vars except for var specified in trywithout option \+ last \+ first |
+| 0              | merge vars + first + last + middle\+ suffix                               |
+| 1              | merge vars + first + last + suffix                                        |
+| 2              | merge vars + first + last + middle                                        |
+| 3              | merge vars + first + last + middle initial                                |
+| 4              | merge vars + first + last                                                 |
+| 5              | merge vars + last word of last name + first                               |
+| 6              | merge vars + first word of last name + first                              |
+| 7              | merge vars + last + initial                                               |
+| 8              | merge vars + last + first names standardized for common nicknames         |
+| 9              | merge vars + last + second part of hyphen + first initial                 |
+| 10             | merge vars + first part of hyphen + first initial                         |
+| 11             | merge vars + last name without any spaces or hyphens                      |
+| 12             | merge vars + middle appended to last name (no spaces), middlelast         |
+| 13             | merge vars + last name appended to middle (no spaces), lastmiddle         |
+| 14             | merge vars + last                                                         |
+| 15             | merge vars except for var specified in trywithout option + last + first   |
 | 100            | unmatched observations from master data                                   |
 | 101            | omitted duplicate observations from master data (unmatched)               |
 | 200            | unmatched observations from using data                                    |
@@ -60,7 +60,14 @@ Merge Codes
 Remarks
 -------
 
-Stuff about how megamerge works
+Each phase of megamerge consists of the following steps
+1. Specify list of variables to be used in the merge
+2. Append previously omitted duplicates from master and using to unmatched observations from master and using respectively.
+3. Generate new variables for certain merges
+4. Save and separte duplicate obsevations from master and using in a separate dataset.
+5. Perform a 1:1 merge of master to using on the variable list for that merge
+6. Append matched observations with a merge_code to indicate which merge a match came from to prior matched observations.
+7. Separate out observations that were not matched from master and using for use in the next merge.
 
 Example(s)
 ----------
@@ -72,21 +79,6 @@ Example(s)
     performs same megamerge, but tries a round without the district variable
 
         . megamerge state dist using data2, replace(pop) trywithout(dist)
-
-Stored results
---------------
-
-describe the Scalars, Matrices, Macros, stored by __XXX__, for example:
-
-### Scalars
-
-> __r(level)__: explain what the scalar does 
-
-### Matrices
-
-> __r(table)__: explain what it includes
-
-Functions
 
 Author
 ------

@@ -41,32 +41,39 @@ trywithout({it:var}) runs one iteration of the merge without the specificed vari
 
 {col 5}{ul:merge code}{col 21}{ul:explanation}
 {space 4}{hline}
-{col 5}0{col 21}merge vars \+ first \+ last \+ middle\+ suffix
-{col 5}1{col 21}merge vars \+ first \+ last \+ suffix
-{col 5}2{col 21}merge vars \+ first \+ last \+ middle
-{col 5}3{col 21}merge vars \+ first \+ last \+ middle initial
-{col 5}4{col 21}merge vars \+ first \+ last
-{col 5}5{col 21}merge vars \+ last word of last name \+ first
-{col 5}6{col 21}merge vars \+ first word of last name \+ first
-{col 5}7{col 21}merge vars \+ last \+ initial
-{col 5}8{col 21}merge vars \+ last \+ first names standardized for common nicknames
-{col 5}9{col 21}merge vars \+ last \+ second part of hyphen \+ first initial
-{col 5}10{col 21}merge vars \+ first part of hyphen \+ first initial
-{col 5}11{col 21}merge vars \+ last name without any spaces or hyphens
-{col 5}12{col 21}merge vars \+ middle appended to last name \(no spaces\), middlelast
-{col 5}13{col 21}merge vars \+ ast name appended to middle\(no spaces\), lastmiddle
-{col 5}14{col 21}merge vars \+ last
-{col 5}15{col 21}merge vars except for var specified in trywithout option \+ last \+ first
+{col 5}0{col 21}merge vars + first + last + middle\+ suffix
+{col 5}1{col 21}merge vars + first + last + suffix
+{col 5}2{col 21}merge vars + first + last + middle
+{col 5}3{col 21}merge vars + first + last + middle initial
+{col 5}4{col 21}merge vars + first + last
+{col 5}5{col 21}merge vars + last word of last name + first
+{col 5}6{col 21}merge vars + first word of last name + first
+{col 5}7{col 21}merge vars + last + initial
+{col 5}8{col 21}merge vars + last + first names standardized for common nicknames
+{col 5}9{col 21}merge vars + last + second part of hyphen + first initial
+{col 5}10{col 21}merge vars + first part of hyphen + first initial
+{col 5}11{col 21}merge vars + last name without any spaces or hyphens
+{col 5}12{col 21}merge vars + middle appended to last name (no spaces), middlelast
+{col 5}13{col 21}merge vars + last name appended to middle (no spaces), lastmiddle
+{col 5}14{col 21}merge vars + last
+{col 5}15{col 21}merge vars except for var specified in trywithout option + last + first
 {col 5}100{col 21}unmatched observations from master data
 {col 5}101{col 21}omitted duplicate observations from master data (unmatched)
 {col 5}200{col 21}unmatched observations from using data
-{col 5}201{col 21}omitted duplicate observations from using data (unmatched).
+{col 5}201{col 21}omitted duplicate observations from using data (unmatched)
 {space 4}{hline}
 
 {title:Remarks}
 
 {p 4 4 2}
-Stuff about how megamerge works
+Each phase of megamerge consists of the following steps
+{break}    1. Specify list of variables to be used in the merge
+{break}    2. Append previously omitted duplicates from master and using to unmatched observations from master and using respectively.
+{break}    3. Generate new variables for certain merges
+{break}    4. Save and separte duplicate obsevations from master and using in a separate dataset.
+{break}    5. Perform a 1:1 merge of master to using on the variable list for that merge
+{break}    6. Append matched observations with a merge_code to indicate which merge a match came from to prior matched observations.
+{break}    7. Separate out observations that were not matched from master and using for use in the next merge.
 
 
 {title:Example(s)}
@@ -78,23 +85,6 @@ Stuff about how megamerge works
     performs same megamerge, but tries a round without the district variable
 
         . megamerge state dist using data2, replace(pop) trywithout(dist)
-
-
-{title:Stored results}
-
-{p 4 4 2}
-describe the Scalars, Matrices, Macros, stored by {bf:XXX}, for example:
-
-{p 4 4 2}{bf:Scalars}
-
-{p 8 8 2} {bf:r(level)}: explain what the scalar does 
-
-{p 4 4 2}{bf:Matrices}
-
-{p 8 8 2} {bf:r(table)}: explain what it includes
-
-{p 4 4 2}
-Functions
 
 
 {title:Author}
