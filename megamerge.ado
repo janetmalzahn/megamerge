@@ -1530,10 +1530,13 @@ append using `merge_matched'
 ***********************************************
 *di "`messy'"
 *if "`messy'" == "" 
+
 di "`mastervars'"
 di "`replace'"
+if "`messy'" == ""{
+	keep `mastervars' `replace' merge_code
+}
 
-keep `mastervars' `replace' merge_code
 *
 
 ***********************************************
