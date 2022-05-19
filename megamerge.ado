@@ -1533,7 +1533,7 @@ append using `merge_matched'
 di "`mastervars'"
 di "`replace'"
 
-keep `mastervars'
+keep `replace'
 *
 
 ***********************************************
