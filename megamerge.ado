@@ -1181,7 +1181,7 @@ append using `all_duplicates_using'
 capture drop dup // drop dup previously generated
 
 * make appended last of middle + last
-gen appended_last = cond(length(middle)>2,middle+last,last)
+gen appended_last = cond(length(middle)>2,middle+nohyphen_last,nohyphen_last)
 
 * tag duplicates in using
 duplicates tag `merge_varlist', gen(dup)
@@ -1205,7 +1205,7 @@ append using `all_duplicates_master'
 capture drop dup // drop dup previously generated
 
 * make appended last
-gen appended_last = cond(length(middle)>2,middle+last,last)
+gen appended_last = cond(length(middle)>2,middle+nohyphen_last,nohyphen_last)
 
 * tag initial duplicates in master
 duplicates tag `merge_varlist', gen(dup)
@@ -1261,7 +1261,7 @@ append using `all_duplicates_using'
 capture drop dup // drop dup previously generated
 
 * make appended last of middle + last
-gen appended_lastmiddle = cond(length(middle)>2,last+middle,last)
+gen appended_lastmiddle = cond(length(middle)>2,nohyphen_last+middle,nohyphen_last)
 
 * tag duplicates in using
 duplicates tag `merge_varlist', gen(dup)
@@ -1285,7 +1285,7 @@ append using `all_duplicates_master'
 capture drop dup // drop dup previously generated
 
 * make appended last
-gen appended_lastmiddle = cond(length(middle)>2,last+middle,last)
+gen appended_lastmiddle = cond(length(middle)>2,nohyphen_last+middle,nohyphen_last)
 
 * tag initial duplicates in master
 duplicates tag `merge_varlist', gen(dup)
