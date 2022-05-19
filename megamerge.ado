@@ -36,7 +36,7 @@ Merge Codes
 
 | **merge code** | **explanation**                                                           |
 |----------------|---------------------------------------------------------------------------|
-| 0              | merge vars + first + last + middle\+ suffix                               |
+| 0              | merge vars + first + last + middle + suffix                               |
 | 1              | merge vars + first + last + suffix                                        |
 | 2              | merge vars + first + last + middle                                        |
 | 3              | merge vars + first + last + middle initial                                |
@@ -45,8 +45,8 @@ Merge Codes
 | 6              | merge vars + first word of last name + first                              |
 | 7              | merge vars + last + initial                                               |
 | 8              | merge vars + last + first names standardized for common nicknames         |
-| 9              | merge vars + last + second part of hyphen + first initial                 |
-| 10             | merge vars + first part of hyphen + first initial                         |
+| 9              | merge vars + last + first part of hyphenated last name + first initial    |
+| 10             | merge vars + second part of hyphenated last name + first initial          |
 | 11             | merge vars + last name without any spaces or hyphens                      |
 | 12             | merge vars + middle appended to last name (no spaces), middlelast         |
 | 13             | merge vars + last name appended to middle (no spaces), lastmiddle         |
@@ -113,7 +113,6 @@ version 15.1
 * define the syntax
 syntax varlist using/ [,replace(string) trywithout(string)]
 
-qui{
 * arguments: master using varlist
 ** master = master dataset
 ** using = using dataset
@@ -1541,9 +1540,7 @@ label values merge_code merge_labs
 label define match_code  1 "Not matched from master" ///
 					     2 "Not matched from using" ///
 					     3 "Matched"
-label values matched match_code
-
-}					 
+label values matched match_code					 
 
 tab merge_code
 tab matched
