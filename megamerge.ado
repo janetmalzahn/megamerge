@@ -132,6 +132,9 @@ assert("`replace'" != "")
 foreach var of varlist first middle last suffix {
 	replace `var' = upper(`var')
 	replace `var' = subinstr(`var', ".", "", .)
+	replace `var' = subinstr(`var', `"""', "", .)
+	replace `var' = subinstr(`var', "(", "",.)
+	replace `var' = subinstr(`var', ")", "",.)
 }
 
 * initial duplicates for master
@@ -177,6 +180,9 @@ use `using', clear
 foreach var of varlist first middle last suffix {
 	replace `var' = upper(`var')
 	replace `var' = subinstr(`var', ".", "", .)
+	replace `var' = subinstr(`var', `"""', "", .)
+	replace `var' = subinstr(`var', "(", "",.)
+	replace `var' = subinstr(`var', ")", "",.)
 }
 
 * get first initial
@@ -857,7 +863,7 @@ save `using_nodups', replace // save file without duplicates
 *------------------------------------------
 * read in the master
 *------------------------------------------
-
+git
 * tag initial duplicates in master
 use `master_merge_unmatched'
 *------------------------------------------
@@ -891,7 +897,7 @@ replace fake_first = "KATHERINE" if inlist(first, "CATHERINE", "KATHERINE", "CAT
 replace fake_first = "MICHAEL" if inlist(first, "MIKE", "MICKEY", "MIKEY", "MICKY", "MICK")
 replace fake_first = "NATHAN" if inlist(first, "NATHANIEL", "NAT", "NATALIE", "NATTIE")
 replace fake_first = "NICK" if inlist(first, "NICOLAS", "NIC", "NICKO", "NIKKO", "NICHOLAS")
-replace fake_first = "EZEKIEL" if inlist(first, "ZEKE", "EZEKIAL")
+replace fake_first = "EZEKIEL" if inlist(first, "ZEKE", "EZEKIAL") // Zeke
 replace fake_first = "FRED" if inlist(first, "FEDERICK", "FREDDY", "FREDDIE", "FREDERIK", "FRIEDERIK") // Fred
 
 *-----------------------------------------
