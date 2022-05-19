@@ -111,7 +111,7 @@ program define megamerge
 version 15.1
 
 * define the syntax
-syntax varlist using/ [,replace(string) trywithout(string)]
+syntax varlist using/ [,replace(string) trywithout(string) messy]
 
 * arguments: master using varlist
 ** master = master dataset
@@ -126,6 +126,10 @@ assert("`replace'" != "")
 *****************************
 * Preclean Master
 *****************************
+
+* get list of variables originally present in master
+describe, varlist
+local mastervars = r(varlist) 
 
 * make all name info uppercase
 * make upper case
@@ -175,6 +179,10 @@ save `master'
 **********************************
 
 use `using', clear
+
+* get list of variables originally present in master
+describe, varlist
+local usingvars = r(varlist) 
 
 * make all variables uppercase and drop periods
 foreach var of varlist first middle last suffix {
@@ -1515,6 +1523,14 @@ append using `all_duplicates_using'
 append using `merge_matched'
 
 ***********************************************
+* Clean up code for messy option
+***********************************************
+if "`messy'" != ""{
+	local keepvars `mastervars' `replace' merge_code
+	keep `keepvars'
+}
+
+***********************************************
 * Label merge_code
 ***********************************************
 
@@ -1551,6 +1567,8 @@ label values matched match_code
 
 tab merge_code
 tab matched
+
+
 
 
 end
