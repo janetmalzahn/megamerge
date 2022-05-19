@@ -1530,10 +1530,11 @@ append using `merge_matched'
 ***********************************************
 *di "`messy'"
 *if "`messy'" == "" 
-	di "`mastervars'"
-	di "`replace'"
-	local varstokeep "`mastervars'" "`replace'" "merge_code"
-	keep "`varstokeep'"
+di "`mastervars'"
+di "`replace'"
+local varstokeep "`mastervars'" "`replace'" "merge_code"
+di "`varstokeep'"
+keep "`varstokeep'"
 *
 
 ***********************************************
