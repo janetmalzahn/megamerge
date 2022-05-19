@@ -111,7 +111,7 @@ program define megamerge
 version 15.1
 
 * define the syntax
-syntax varlist using/ [,replace(string) trywithout(string) messy]
+syntax varlist using/ [, replace(string) trywithout(string) messy]
 
 * arguments: master using varlist
 ** master = master dataset
@@ -129,7 +129,7 @@ assert("`replace'" != "")
 
 * get list of variables originally present in master
 describe, varlist
-local mastervars = r(varlist) 
+local mastervars "`r(varlist)'"
 
 di "`mastervars'"
 
@@ -184,7 +184,7 @@ use `using', clear
 
 * get list of variables originally present in master
 describe, varlist
-local usingvars = r(varlist) 
+local usingvars = "`r(varlist)'" 
 
 * make all variables uppercase and drop periods
 foreach var of varlist first middle last suffix {
