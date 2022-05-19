@@ -831,9 +831,10 @@ replace fake_first = "JOHN" if inlist(first, "JON", "JOHNNY", "JONATHAN", "JOHNN
 replace fake_first = "CHRIS" if inlist(first, "CHRISTY", "CHRISSY", "TINA", "CHRISTINA", "CHRISTOPHER", "CHRISTOPH", "CRIS", "KRIS") // Chris
 replace fake_first = "KATHERINE" if inlist(first, "CATHERINE", "KATHERINE", "CATIE", "KATH", "KATIE") // Katherine
 replace fake_first = "MICHAEL" if inlist(first, "MIKE", "MICKEY", "MIKEY", "MICKY", "MICK")
-replace fake_first = "NATHAN" if inlist(first, "NATHANIEL", "NAT", "NATALIE", "NATTIE")
-replace fake_first = "NICK" if inlist(first, "NICOLAS", "NIC", "NICKO", "NIKKO", "NICHOLAS")
-replace fake_first = "EZEKIEL" if inlist(first, "ZEKE", "EZEKIAL")
+replace fake_first = "NATHAN" if inlist(first, "NATHANIEL", "NAT", "NATALIE", "NATTIE") // Nats
+replace fake_first = "NICK" if inlist(first, "NICOLAS", "NIC", "NICKO", "NIKKO", "NICHOLAS") // Nick
+replace fake_first = "EZEKIEL" if inlist(first, "ZEKE", "EZEKIAL") // Zeke
+replace fake_first = "FRED" if inlist(first, "FEDERICK", "FREDDY", "FREDDIE", "FREDERIK", "FRIEDERIK") // Fred
 
 *-----------------------------------------
 * separate out duplicates for the using
@@ -891,6 +892,7 @@ replace fake_first = "MICHAEL" if inlist(first, "MIKE", "MICKEY", "MIKEY", "MICK
 replace fake_first = "NATHAN" if inlist(first, "NATHANIEL", "NAT", "NATALIE", "NATTIE")
 replace fake_first = "NICK" if inlist(first, "NICOLAS", "NIC", "NICKO", "NIKKO", "NICHOLAS")
 replace fake_first = "EZEKIEL" if inlist(first, "ZEKE", "EZEKIAL")
+replace fake_first = "FRED" if inlist(first, "FEDERICK", "FREDDY", "FREDDIE", "FREDERIK", "FRIEDERIK") // Fred
 
 *-----------------------------------------
 * separate out duplicates for the master
