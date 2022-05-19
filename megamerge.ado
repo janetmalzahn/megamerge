@@ -1532,9 +1532,8 @@ append using `merge_matched'
 *if "`messy'" == "" 
 di "`mastervars'"
 di "`replace'"
-local varstokeep "`mastervars'" "`replace'" "merge_code"
-di "`varstokeep'"
-keep "`varstokeep'"
+
+keep `mastervars' `replace' merge_code
 *
 
 ***********************************************
