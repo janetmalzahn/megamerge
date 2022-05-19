@@ -863,7 +863,6 @@ save `using_nodups', replace // save file without duplicates
 *------------------------------------------
 * read in the master
 *------------------------------------------
-git
 * tag initial duplicates in master
 use `master_merge_unmatched'
 *------------------------------------------
