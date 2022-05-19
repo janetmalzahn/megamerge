@@ -129,9 +129,10 @@ assert("`replace'" != "")
 
 * get list of variables originally present in master
 describe, varlist
-local mastervars `r(varlist)'
+local mastervars = "`r(varlist)'"
 
 di "`mastervars'"
+di "`replace'"
 
 * make all name info uppercase
 * make upper case
