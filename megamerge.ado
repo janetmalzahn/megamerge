@@ -1532,7 +1532,7 @@ append using `merge_matched'
 *if "`messy'" == "" 
 	di "`mastervars'"
 	di "`replace'"
-	local varstokeep = `mastervars' `replace' merge_code
+	local varstokeep "`mastervars'" "`replace'" "merge_code"
 	keep "`varstokeep'"
 *
 
