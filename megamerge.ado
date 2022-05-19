@@ -1526,8 +1526,8 @@ append using `merge_matched'
 * Clean up code for messy option
 ***********************************************
 if "`messy'" == ""{
-	local keepvars `mastervars' `replace' merge_code
-	keep `keepvars'
+	local varstokeep `mastervars' `replace' merge_code 
+	keep "`varstokeep'"
 }
 
 ***********************************************
