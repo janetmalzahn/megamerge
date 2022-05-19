@@ -131,6 +131,8 @@ assert("`replace'" != "")
 describe, varlist
 local mastervars = r(varlist) 
 
+di "`mastervars'"
+
 * make all name info uppercase
 * make upper case
 foreach var of varlist first middle last suffix {
@@ -1526,7 +1528,9 @@ append using `merge_matched'
 * Clean up code for messy option
 ***********************************************
 if "`messy'" == ""{
-	local varstokeep `mastervars' `replace' merge_code 
+	di "`mastervars'"
+	di "`replace'"
+	local varstokeep `mastervars' `replace' merge_code
 	keep "`varstokeep'"
 }
 
