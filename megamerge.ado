@@ -14,7 +14,8 @@ Syntax
 | _option_          |  _Description_          |
 |:------------------------|:----------------------------------------------|
 | replace(_varlist_)     | retains variables of interest from using data   |
-| trywithout(_var_) | try merge without included variable  |
+| trywithout(_var_)      | try merge without included variable  |
+| messy                  | keep intermediate variables created by megamerge
 
 
 Description
@@ -30,6 +31,8 @@ Options
 replace(_varlist_) requires the user to specify which variables they want to merge in from the using dataset, ensuring that the variables the user wants to merge from the using to the master do not get replaced. For example, if the user wants to merge in "id" from using, they must use the replace(id) option. This option is _required_.
 
 trywithout(_var_) runs one iteration of the merge without the specificed variable. The variable given the this option must be contained in the varlist given originally to megamerge. 
+
+messy keeps all variables created by megamerge (and all from using not of interest). By default, megamerge keeps the variables originally in master and those specified to the required replace() option. 
 
 Merge Codes
 -----------
@@ -111,7 +114,7 @@ program define megamerge
 version 15.1
 
 * define the syntax
-syntax varlist using/ [, replace(string) trywithout(string) messy]
+syntax varlist using/ [, replace(string) trywithout(string) messy omitmerges(string) keepmerges(string)]
 
 * arguments: master using varlist
 ** master = master dataset
@@ -119,9 +122,18 @@ syntax varlist using/ [, replace(string) trywithout(string) messy]
 ** varlist = varlist for merge 
 
 ******************************************
-* Make sure replace option is specified
+* Check for required options
 ******************************************
 assert("`replace'" != "")
+
+* makes sure these 
+if "`keepmerges'" != ""{
+	numlist `keepmerges', integer
+}
+if "`omitmerges'" != ""{
+	numlist `omitmerges', integer
+}
+
 
 *****************************
 * Preclean Master
@@ -439,6 +451,7 @@ restore
 	capture drop _merge
 	capture drop `replace'
 	save `master_merge_unmatched', replace
+
 
 ****************************************************
 * Third Pass: Merge on Middle Init + First + Last
@@ -1528,11 +1541,7 @@ append using `merge_matched'
 ***********************************************
 * Clean up code for messy option
 ***********************************************
-*di "`messy'"
-*if "`messy'" == "" 
-
-di "`mastervars'"
-di "`replace'"
+* keep variables in master and variables of interest from using
 if "`messy'" == ""{
 	keep `mastervars' `replace' merge_code
 }
