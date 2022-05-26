@@ -1,5 +1,5 @@
 /***
-_version 1.12_ 
+_version 1.2_ 
 
 megamerge
 ===== 
@@ -122,6 +122,11 @@ syntax varlist using/ [, replace(string) trywithout(string) messy omitmerges(str
 ** varlist = varlist for merge 
 
 quietly {
+******************************************
+* Load subroutines
+******************************************
+do ./minimerge.ado
+do ./replace_nicknames.ado
 ******************************************
 * Check for required options
 ******************************************
