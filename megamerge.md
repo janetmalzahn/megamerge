@@ -9,30 +9,28 @@ data with names and additional variables.
 Syntax
 ------
 
-> **megamerge** *varlist* using *filename* , replace(*varlist*) \[
-> *options*\]
+> **megamerge** *varlist* using *filename* \[, *options*\]
 
   ------------------------------------------------------------------------
-  *option*              *Description*
-  --------------------- --------------------------------------------------
-  replace(*varlist*)    retains variables of interest from using data
+  *options*                *Description*
+  ------------------------ -----------------------------------------------
+  **trywithout(*var*)**    try merge without included variable
 
-  trywithout(*var*)     try merge without included variable
+  **messy**                keep intermediate variables created by
+                           megamerge
 
-  messy                 keep intermediate variables created by megamerge
+  **omitmerges**(*mergecod do not perform the merges corresponding to the
+  es*)                     listed codes
 
-  omitmerges(integer    do not perform the merges corresponding to the
-  list)                 listed codes
-
-  keepmerges(integer    perform only the merges corresponding to the
-  list)                 listed codes
+  **keepmerges**(*merge\_c perform only the merges corresponding to the
+  odes*)                   listed codes
   ------------------------------------------------------------------------
 
 Description
 -----------
 
-megamerge performs sequential 1:1 merges in decreasing orders of
-specificity to match record with names. Megamerge requires that both
+**megamerge** performs sequential 1:1 merges in decreasing orders of
+specificity to match record with names. **megamerge** requires that both
 master and using data have the variables first, last, middle, and
 suffix.
 
@@ -45,27 +43,19 @@ for the next merge.
 Options
 -------
 
-replace(*varlist*) requires the user to specify which variables they
-want to merge in from the using dataset, ensuring that the variables the
-user wants to merge from the using to the master do not get replaced.
-For example, if the user wants to merge in &gt; "id" from using, they
-must use the replace(id) option. This option is *required*.
+**trywithout**(*var*) runs one iteration of the merge without the
+specificed variable. The variable given the this option must be
+contained in the varlist given originally to megamerge.
 
-trywithout(*var*) runs one iteration of the merge without the specificed
-variable. The variable given the this option must be contained in the
-varlist given originally to megamerge.
+**messy** specifies that all variables created by megamerge (and all
+from using not of interest) be kept. By default, megamerge keeps the
+variables originally in master and using.
 
-messy keeps all variables created by megamerge (and all from using not
-of interest). By default, megamerge keeps the variables originally in
-master and those specified to the required replace() option.
+**keepmerges**(*mergecodes*) specifies that only merges corresponding to
+*merge\_codes* be run. This option supercedes omitmerges().
 
-keepmerges(*integer list*) runs megamerge only the merges corresponding
-to the merge\_codes (detailed below) specified in the option. This
-option supercedes omitmerges().
-
-omitmerges(*integer list*) runs megamerge without the merges
-corresponding to the merge\_codes (detailed below) specified in the
-option.
+**omitmerges**(*mergecode*) specifies that merges corresponding to the
+*merge\_codes* (detailed below) be skipped.
 
 Merge Codes
 -----------
@@ -141,11 +131,23 @@ Example(s)
 
     performs a megamerge of data in memory to data2 on name vars, state, and dist to get pop
 
-            . megamerge state dist using data2, replace(pop)
+            . megamerge state dist using data2
 
     performs same megamerge, but tries a round without the district variable
 
-            . megamerge state dist using data2, replace(pop) trywithout(dist)
+            . megamerge state dist using data2, trywithout(dist)
+                    
+    performs same megamerge, but only on last name and on last and initial
+
+            . megamerge state dist using data2, trywithout(dist) keepmerges(7 14)
+                    
+    performs same megamerge, but without a merge on nicknames
+
+            . megamerge state dist using data2, trywithout(dist) omitmerge(8)
+                    
+            performs same megamerge, but keeps all intermediate variables
+
+            . megamerge state dist using data2, trywithout(dist) messy
 
 Author
 ------

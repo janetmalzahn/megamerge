@@ -9,36 +9,33 @@ __megamerge__ performs 15 1:1 merges sequentially to exhaustively link data with
 Syntax
 ------ 
 
-> __megamerge__ _varlist_ using _filename_ , replace(_varlist_) [ _options_]
+> __megamerge__ _varlist_ using _filename_ [, _options_]
 
-| _option_          |  _Description_          |
-|:-------------------------|:-------------------------------------------------------------|
-| replace(_varlist_)       | retains variables of interest from using data                |
-| trywithout(_var_)        | try merge without included variable                          |
-| messy                    | keep intermediate variables created by megamerge             |
-| omitmerges(integer list) | do not perform the merges corresponding to the listed codes  |
-| keepmerges(integer list) | perform only the merges corresponding to the listed codes    |
+| _options_          |  _Description_          |
+|:-------------------------------|:-------------------------------------------------------------|
+| __trywithout(_var_)__          | try merge without included variable                          |
+| __messy__                      | keep intermediate variables created by megamerge             |
+| __omitmerges__(_mergecodes_)  | do not perform the merges corresponding to the listed codes  |
+| __keepmerges__(_merge_codes_)  | perform only the merges corresponding to the listed codes    |
 
 
 Description
 -----------
 
-megamerge performs sequential 1:1 merges in decreasing orders of specificity to match record with names. Megamerge requires that both master and using data have the variables first, last, middle, and suffix.
+__megamerge__ performs sequential 1:1 merges in decreasing orders of specificity to match record with names. __megamerge__ requires that both master and using data have the variables first, last, middle, and suffix.
 
 Each merge is in decreasing levels of specificity, so observations are matched on the most information avaiable. Since the merges are 1:1, observations that are not unique merge variables in the master and the using are omitted at each merge but appended to the ummatched data for the next merge. 
 
 Options
 -------
 
-replace(_varlist_) requires the user to specify which variables they want to merge in from the using dataset, ensuring that the variables the user wants to merge from the using to the master do not get replaced. For example, if the user wants to merge in "id" from using, they must use the replace(id) option. This option is _required_.
+__trywithout__(_var_) runs one iteration of the merge without the specificed variable. The variable given the this option must be contained in the varlist given originally to megamerge. 
 
-trywithout(_var_) runs one iteration of the merge without the specificed variable. The variable given the this option must be contained in the varlist given originally to megamerge. 
+__messy__ specifies that all variables created by megamerge (and all from using not of interest) be kept. By default, megamerge keeps the variables originally in master and using.
 
-messy keeps all variables created by megamerge (and all from using not of interest). By default, megamerge keeps the variables originally in master and those specified to the required replace() option.
+__keepmerges__(_mergecodes_) specifies that only merges corresponding to _merge_codes_ be run. This option supercedes omitmerges().
 
-keepmerges(_integer list_) runs megamerge only the merges corresponding to the merge_codes (detailed below) specified in the option. This option supercedes omitmerges().
-
-omitmerges(_integer list_) runs megamerge without the merges corresponding to the merge_codes (detailed below) specified in the option.
+__omitmerges__(_mergecode_) specifies that merges corresponding to the _merge_codes_ (detailed below) be skipped.
 
 
 Merge Codes
@@ -84,11 +81,23 @@ Example(s)
 
     performs a megamerge of data in memory to data2 on name vars, state, and dist to get pop
 
-        . megamerge state dist using data2, replace(pop)
+        . megamerge state dist using data2
 
     performs same megamerge, but tries a round without the district variable
 
-        . megamerge state dist using data2, replace(pop) trywithout(dist)
+        . megamerge state dist using data2, trywithout(dist)
+		
+    performs same megamerge, but only on last name and on last and initial
+
+        . megamerge state dist using data2, trywithout(dist) keepmerges(7 14)
+		
+    performs same megamerge, but without a merge on nicknames
+
+        . megamerge state dist using data2, trywithout(dist) omitmerge(8)
+		
+	performs same megamerge, but keeps all intermediate variables
+
+        . megamerge state dist using data2, trywithout(dist) messy
 
 Author
 ------
@@ -121,34 +130,37 @@ program define megamerge
 version 15.1
 
 * define the syntax
-syntax varlist using/ , replace(string) [trywithout(string) messy omitmerges(string) keepmerges(string)]
+syntax varlist using/ [, trywithout(string) messy omitmerges(string) keepmerges(string)]
 
 * arguments: master using varlist
 ** master = master dataset
 ** using = using dataset
 ** varlist = varlist for merge 
 
-quietly {
+
 ******************************************
 * Load subroutines
 ******************************************
+
 do ./minimerge.ado
 do ./replace_nicknames.ado
-******************************************
-* Check for required options
-******************************************
-assert("`replace'" != "")
 
-* makes sure these 
+******************************************
+* Get list of included merges
+******************************************
+
+* set list to keepmerges contents if specified
 if "`keepmerges'" != ""{
 	numlist "`keepmerges'"
 	local included_merges `r(numlist)'
 }
+* if no keepmerges, omit omitmerges contents if sepcified
 else if "`omitmerges'" != ""{
 	numlist "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15"
 	local my_list `r(numlist)'
 	local included_merges : list my_list - omitmerges
 }
+* if neither option is specified, do all merges
 else{
 	numlist "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15"
 	local included_merges `r(numlist)'
@@ -163,7 +175,7 @@ describe, varlist
 local mastervars = "`r(varlist)'"
 
 di "`mastervars'"
-di "`replace'"
+*di "`replace'"
 
 * make all name info uppercase
 * make upper case
@@ -257,6 +269,11 @@ forvalues x = 1/`n'{
 tempfile using_merge_unmatched
 save `using_merge_unmatched'
 
+****************************************
+* Make replace varlist
+****************************************
+local replace : list usingvars - mastervars
+
 ******************************
 * Make requisite tempfiles
 ******************************
@@ -314,16 +331,18 @@ foreach i in `included_merges' {
 	}
 	
 	if `i' != 15{
-		minimerge `varlist', extravars(`merge_varlist') replace(`replace') ///
-		merge_code(`i') using_merge_unmatched(`using_merge_unmatched') ///
+		* perform merge step
+		minimerge `varlist', extravars(`merge_varlist')  ///
+		replace(`replace') merge_code(`i')  ///
+		using_merge_unmatched(`using_merge_unmatched') ///
 		master_merge_unmatched(`master_merge_unmatched') merge_matched(`merge_matched') ///
 		all_duplicates_using(`all_duplicates_using') all_duplicates_master(`all_duplicates_master')
 	}
-	
+	* handle trywithout option
 	else if `i' == 15{
 		if "`trywithout'" != "" {
 			foreach item in `trywithout'{
-				local tempvarlist : list varlist - item
+				local tempvarlist : list varlist - item // get og varlist minus trywithout var
 				minimerge `tempvarlist', extravars(last first) replace(`replace') /// 
 					merge_code(`i') using_merge_unmatched(`using_merge_unmatched')  ///
 					master_merge_unmatched(`master_merge_unmatched')  ///
@@ -368,7 +387,8 @@ append using `merge_matched'
 ***********************************************
 * keep variables in master and variables of interest from using
 if "`messy'" == ""{
-	keep `mastervars' `replace' merge_code
+	local keep_vars : list mastervars | usingvars
+	keep `keep_vars' merge_code
 }
 
 ***********************************************
@@ -404,9 +424,9 @@ label values merge_code merge_labs
 label define match_code  1 "Not matched from master" ///
 					     2 "Not matched from using" ///
 					     3 "Matched"
-label values matched match_code	
+label values matched match_code		
 
-}				 
+order `mastervars' `replace' merge_code matched		 
 
 tab merge_code
 tab matched
