@@ -1,5 +1,5 @@
 {smcl}
-{it:version 1.1} 
+{it:version 1.2} 
 
 
 {title:megamerge}
@@ -12,11 +12,14 @@
 
 {p 8 8 2} {bf:megamerge} {it:varlist} using {it:filename} , replace({it:varlist}) [ {it:options}]
 
-{col 5}{it:option}{col 30}{it:Description}
-{space 4}{hline 72}
-{col 5}replace({it:varlist}){col 30}retains variables of interest from using data
-{col 5}trywithout({it:var}){col 30}try merge without included variable
-{space 4}{hline 72}
+{col 5}{it:option}{col 31}{it:Description}
+{space 4}{hline}
+{col 5}replace({it:varlist}){col 31}retains variables of interest from using data
+{col 5}trywithout({it:var}){col 31}try merge without included variable
+{col 5}messy{col 31}keep intermediate variables created by megamerge
+{col 5}omitmerges(integer list){col 31}do not perform the merges corresponding to the listed codes
+{col 5}keepmerges(integer list){col 31}perform only the merges corresponding to the listed codes
+{space 4}{hline}
 
 
 {title:Description}
@@ -36,12 +39,22 @@ replace({it:varlist}) requires the user to specify which variables they want to 
 {p 4 4 2}
 trywithout({it:var}) runs one iteration of the merge without the specificed variable. The variable given the this option must be contained in the varlist given originally to megamerge. 
 
+{p 4 4 2}
+messy keeps all variables created by megamerge (and all from using not of interest). By default, megamerge keeps the variables originally in master and those specified to the required replace() option.
+
+{p 4 4 2}
+keepmerges({it:integer list}) runs megamerge only the merges corresponding to the merge_codes (detailed below) specified in the option. This option supercedes omitmerges().
+
+{p 4 4 2}
+omitmerges({it:integer list}) runs megamerge without the merges corresponding to the merge_codes (detailed below) specified in the option.
+
+
 
 {title:Merge Codes}
 
 {col 5}{ul:merge code}{col 21}{ul:explanation}
 {space 4}{hline}
-{col 5}0{col 21}merge vars + first + last + middle\+ suffix
+{col 5}0{col 21}merge vars + first + last + middle + suffix
 {col 5}1{col 21}merge vars + first + last + suffix
 {col 5}2{col 21}merge vars + first + last + middle
 {col 5}3{col 21}merge vars + first + last + middle initial
@@ -50,8 +63,8 @@ trywithout({it:var}) runs one iteration of the merge without the specificed vari
 {col 5}6{col 21}merge vars + first word of last name + first
 {col 5}7{col 21}merge vars + last + initial
 {col 5}8{col 21}merge vars + last + first names standardized for common nicknames
-{col 5}9{col 21}merge vars + last + second part of hyphen + first initial
-{col 5}10{col 21}merge vars + first part of hyphen + first initial
+{col 5}9{col 21}merge vars + last + first part of hyphenated last name + first initial
+{col 5}10{col 21}merge vars + second part of hyphenated last name + first initial
 {col 5}11{col 21}merge vars + last name without any spaces or hyphens
 {col 5}12{col 21}merge vars + middle appended to last name (no spaces), middlelast
 {col 5}13{col 21}merge vars + last name appended to middle (no spaces), lastmiddle

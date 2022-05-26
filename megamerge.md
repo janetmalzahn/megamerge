@@ -1,4 +1,4 @@
-*version 1.1*
+*version 1.2*
 
 megamerge
 =========
@@ -12,10 +12,21 @@ Syntax
 > **megamerge** *varlist* using *filename* , replace(*varlist*) \[
 > *options*\]
 
-  *option*             *Description*
-  -------------------- -----------------------------------------------
-  replace(*varlist*)   retains variables of interest from using data
-  trywithout(*var*)    try merge without included variable
+  ------------------------------------------------------------------------
+  *option*              *Description*
+  --------------------- --------------------------------------------------
+  replace(*varlist*)    retains variables of interest from using data
+
+  trywithout(*var*)     try merge without included variable
+
+  messy                 keep intermediate variables created by megamerge
+
+  omitmerges(integer    do not perform the merges corresponding to the
+  list)                 listed codes
+
+  keepmerges(integer    perform only the merges corresponding to the
+  list)                 listed codes
+  ------------------------------------------------------------------------
 
 Description
 -----------
@@ -44,6 +55,18 @@ trywithout(*var*) runs one iteration of the merge without the specificed
 variable. The variable given the this option must be contained in the
 varlist given originally to megamerge.
 
+messy keeps all variables created by megamerge (and all from using not
+of interest). By default, megamerge keeps the variables originally in
+master and those specified to the required replace() option.
+
+keepmerges(*integer list*) runs megamerge only the merges corresponding
+to the merge\_codes (detailed below) specified in the option. This
+option supercedes omitmerges().
+
+omitmerges(*integer list*) runs megamerge without the merges
+corresponding to the merge\_codes (detailed below) specified in the
+option.
+
 Merge Codes
 -----------
 
@@ -51,7 +74,7 @@ Merge Codes
   **merge       **explanation**
   code**        
   ------------- ----------------------------------------------------------
-  0             merge vars + first + last + middle+ suffix
+  0             merge vars + first + last + middle + suffix
 
   1             merge vars + first + last + suffix
 
@@ -70,9 +93,11 @@ Merge Codes
   8             merge vars + last + first names standardized for common
                 nicknames
 
-  9             merge vars + last + second part of hyphen + first initial
+  9             merge vars + last + first part of hyphenated last name +
+                first initial
 
-  10            merge vars + first part of hyphen + first initial
+  10            merge vars + second part of hyphenated last name + first
+                initial
 
   11            merge vars + last name without any spaces or hyphens
 

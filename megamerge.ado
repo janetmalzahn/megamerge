@@ -12,10 +12,12 @@ Syntax
 > __megamerge__ _varlist_ using _filename_ , replace(_varlist_) [ _options_]
 
 | _option_          |  _Description_          |
-|:------------------------|:----------------------------------------------|
-| replace(_varlist_)     | retains variables of interest from using data   |
-| trywithout(_var_)      | try merge without included variable  |
-| messy                  | keep intermediate variables created by megamerge
+|:-------------------------|:-------------------------------------------------------------|
+| replace(_varlist_)       | retains variables of interest from using data                |
+| trywithout(_var_)        | try merge without included variable                          |
+| messy                    | keep intermediate variables created by megamerge             |
+| omitmerges(integer list) | do not perform the merges corresponding to the listed codes  |
+| keepmerges(integer list) | perform only the merges corresponding to the listed codes    |
 
 
 Description
@@ -32,7 +34,12 @@ replace(_varlist_) requires the user to specify which variables they want to mer
 
 trywithout(_var_) runs one iteration of the merge without the specificed variable. The variable given the this option must be contained in the varlist given originally to megamerge. 
 
-messy keeps all variables created by megamerge (and all from using not of interest). By default, megamerge keeps the variables originally in master and those specified to the required replace() option. 
+messy keeps all variables created by megamerge (and all from using not of interest). By default, megamerge keeps the variables originally in master and those specified to the required replace() option.
+
+keepmerges(_integer list_) runs megamerge only the merges corresponding to the merge_codes (detailed below) specified in the option. This option supercedes omitmerges().
+
+omitmerges(_integer list_) runs megamerge without the merges corresponding to the merge_codes (detailed below) specified in the option.
+
 
 Merge Codes
 -----------
@@ -114,7 +121,7 @@ program define megamerge2
 version 15.1
 
 * define the syntax
-syntax varlist using/ [, replace(string) trywithout(string) messy omitmerges(string) keepmerges(string)]
+syntax varlist using/ , replace(string) [trywithout(string) messy omitmerges(string) keepmerges(string)]
 
 * arguments: master using varlist
 ** master = master dataset
