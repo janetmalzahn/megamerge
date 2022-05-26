@@ -10,22 +10,21 @@
 
 {title:Syntax}
 
-{p 8 8 2} {bf:megamerge} {it:varlist} using {it:filename} , replace({it:varlist}) [ {it:options}]
+{p 8 8 2} {bf:megamerge} {it:varlist} using {it:filename} [, {it:options}]
 
-{col 5}{it:option}{col 31}{it:Description}
+{col 5}{it:options}{col 37}{it:Description}
 {space 4}{hline}
-{col 5}replace({it:varlist}){col 31}retains variables of interest from using data
-{col 5}trywithout({it:var}){col 31}try merge without included variable
-{col 5}messy{col 31}keep intermediate variables created by megamerge
-{col 5}omitmerges(integer list){col 31}do not perform the merges corresponding to the listed codes
-{col 5}keepmerges(integer list){col 31}perform only the merges corresponding to the listed codes
+{col 5}{bf:trywithout({it:var})}{col 37}try merge without included variable
+{col 5}{bf:messy}{col 37}keep intermediate variables created by megamerge
+{col 5}{bf:omitmerges__(*merge_codes*){col 37}do not perform the merges corresponding to the listed codes
+{col 5}{bf:keepmerges__(*merge_codes*){col 37}perform only the merges corresponding to the listed codes
 {space 4}{hline}
 
 
 {title:Description}
 
 {p 4 4 2}
-megamerge performs sequential 1:1 merges in decreasing orders of specificity to match record with names. Megamerge requires that both master and using data have the variables first, last, middle, and suffix.
+{bf:megamerge} performs sequential 1:1 merges in decreasing orders of specificity to match record with names. {bf:megamerge} requires that both master and using data have the variables first, last, middle, and suffix.
 
 {p 4 4 2}
 Each merge is in decreasing levels of specificity, so observations are matched on the most information avaiable. Since the merges are 1:1, observations that are not unique merge variables in the master and the using are omitted at each merge but appended to the ummatched data for the next merge. 
@@ -34,19 +33,16 @@ Each merge is in decreasing levels of specificity, so observations are matched o
 {title:Options}
 
 {p 4 4 2}
-replace({it:varlist}) requires the user to specify which variables they want to merge in from the using dataset, ensuring that the variables the user wants to merge from the using to the master do not get replaced. For example, if the user wants to merge in "id" from using, they must use the replace(id) option. This option is {it:required}.
+{bf:trywithout__(*var*) runs one iteration of the merge without the specificed variable. The variable given the this option must be contained in the varlist given originally to megamerge. 
 
 {p 4 4 2}
-trywithout({it:var}) runs one iteration of the merge without the specificed variable. The variable given the this option must be contained in the varlist given originally to megamerge. 
+{bf:messy} specifies that all variables created by megamerge (and all from using not of interest) be kept. By default, megamerge keeps the variables originally in master and using.
 
 {p 4 4 2}
-messy keeps all variables created by megamerge (and all from using not of interest). By default, megamerge keeps the variables originally in master and those specified to the required replace() option.
+___keepmerges__(*merge_codes*) specifies that only merges corresponding to *merge_codes* be run. This option supercedes omitmerges().
 
 {p 4 4 2}
-keepmerges({it:integer list}) runs megamerge only the merges corresponding to the merge_codes (detailed below) specified in the option. This option supercedes omitmerges().
-
-{p 4 4 2}
-omitmerges({it:integer list}) runs megamerge without the merges corresponding to the merge_codes (detailed below) specified in the option.
+{bf:omitmerges__(*merge_code*) specifies that merges corresponding to the *merge_codes* (detailed below) be skipped.
 
 
 
