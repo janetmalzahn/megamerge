@@ -1,10 +1,12 @@
-v 1.1
+v 1.2
 d 'MEGAMERGE': megamerge
 d 
-d multi-phase merge for 1:1 matching data with names
+d 15 1:1 merges sequentially to exhaustively link data with sequential merges for matching data with names
 d 
-d Distribution-Date:   20220516
+d Distribution-Date:   20220526
 d License: MIT
 d 
 F megamerge.ado
 F megamerge.sthlp
+F minimerge.ado
+F replace_nicknames.ado

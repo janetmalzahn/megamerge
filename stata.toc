@@ -1,8 +1,8 @@
-v 1.1
+v 1.2
 d Materials by Janet Malzahn
 d Stanford Institute for Economic Policy Research
 d jmalzahn@stanford.edu
 
-d 'megamerge': multi-phase merge for 1:1 matching data with names
+d 'megamerge': 15 1:1 merges sequentially to exhaustively link data with sequential merges for matching data with names
 
 p megamerge
