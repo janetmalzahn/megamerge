@@ -4,7 +4,7 @@ _version 1.2_
 megamerge
 ===== 
 
-__megamerge__ performs 15 1:1 merges sequentially to exhaustively link data with names and additional variables. 
+__megamerge__ performs up to 16 1:1 merges sequentially to exhaustively link data with names and additional variables. 
 
 Syntax
 ------ 
@@ -15,8 +15,8 @@ Syntax
 |:-------------------------------|:-------------------------------------------------------------|
 | __trywithout(_var_)__          | try merge without included variable                          |
 | __messy__                      | keep intermediate variables created by megamerge             |
-| __omitmerges__(_mergecodes_)  | do not perform the merges corresponding to the listed codes  |
-| __keepmerges__(_merge_codes_)  | perform only the merges corresponding to the listed codes    |
+| __omitmerges(_mergecodes_)__  | do not perform the merges corresponding to the listed codes  |
+| __keepmerges(_merge_codes_)__  | perform only the merges corresponding to the listed codes    |
 
 
 Description
@@ -29,13 +29,13 @@ Each merge is in decreasing levels of specificity, so observations are matched o
 Options
 -------
 
-__trywithout__(_var_) runs one iteration of the merge without the specificed variable. The variable given the this option must be contained in the varlist given originally to megamerge. 
+__trywithout(_var_)__ runs one iteration of the merge without the specificed variable. The variable given the this option must be contained in the varlist given originally to megamerge. 
 
 __messy__ specifies that all variables created by megamerge (and all from using not of interest) be kept. By default, megamerge keeps the variables originally in master and using.
 
-__keepmerges__(_mergecodes_) specifies that only merges corresponding to _merge_codes_ be run. This option supercedes omitmerges().
+__keepmerges(_mergecodes_)__ specifies that only merges corresponding to _merge_codes_ be run. This option supercedes omitmerges().
 
-__omitmerges__(_mergecode_) specifies that merges corresponding to the _merge_codes_ (detailed below) be skipped.
+__omitmerges(_mergecode_)__ specifies that merges corresponding to the _merge_codes_ (detailed below) be skipped.
 
 
 Merge Codes

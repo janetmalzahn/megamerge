@@ -5,7 +5,7 @@
 {title:megamerge}
 
 {p 4 4 2}
-{bf:megamerge} performs 15 1:1 merges sequentially to exhaustively link data with names and additional variables. 
+{bf:megamerge} performs up to 16 1:1 merges sequentially to exhaustively link data with names and additional variables. 
 
 
 {title:Syntax}
@@ -16,8 +16,8 @@
 {space 4}{hline}
 {col 5}{bf:trywithout({it:var})}{col 37}try merge without included variable
 {col 5}{bf:messy}{col 37}keep intermediate variables created by megamerge
-{col 5}{bf:omitmerges__({it:mergecodes}){col 37}do not perform the merges corresponding to the listed codes
-{col 5}{bf:keepmerges__({it:merge_codes}){col 37}perform only the merges corresponding to the listed codes
+{col 5}{bf:omitmerges({it:mergecodes})}{col 37}do not perform the merges corresponding to the listed codes
+{col 5}{bf:keepmerges({it:merge_codes})}{col 37}perform only the merges corresponding to the listed codes
 {space 4}{hline}
 
 
@@ -33,16 +33,16 @@ Each merge is in decreasing levels of specificity, so observations are matched o
 {title:Options}
 
 {p 4 4 2}
-{bf:trywithout__({it:var}) runs one iteration of the merge without the specificed variable. The variable given the this option must be contained in the varlist given originally to megamerge. 
+{bf:trywithout({it:var})} runs one iteration of the merge without the specificed variable. The variable given the this option must be contained in the varlist given originally to megamerge. 
 
 {p 4 4 2}
 {bf:messy} specifies that all variables created by megamerge (and all from using not of interest) be kept. By default, megamerge keeps the variables originally in master and using.
 
 {p 4 4 2}
-{bf:keepmerges__({it:mergecodes}) specifies that only merges corresponding to {it:merge_codes} be run. This option supercedes omitmerges().
+{bf:keepmerges({it:mergecodes})} specifies that only merges corresponding to {it:merge_codes} be run. This option supercedes omitmerges().
 
 {p 4 4 2}
-{bf:omitmerges__({it:mergecode}) specifies that merges corresponding to the {it:merge_codes} (detailed below) be skipped.
+{bf:omitmerges({it:mergecode})} specifies that merges corresponding to the {it:merge_codes} (detailed below) be skipped.
 
 
 
