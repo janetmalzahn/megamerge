@@ -114,8 +114,8 @@ This help file was dynamically produced by
 ***/
 
 
-capture program drop megamerge2
-program define megamerge2
+capture program drop megamerge
+program define megamerge
 
 * define version number
 version 15.1
