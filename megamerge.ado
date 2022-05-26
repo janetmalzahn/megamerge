@@ -137,14 +137,6 @@ syntax varlist using/ [, trywithout(string) messy omitmerges(string) keepmerges(
 ** using = using dataset
 ** varlist = varlist for merge 
 
-
-******************************************
-* Load subroutines
-******************************************
-
-do ./minimerge.ado
-do ./replace_nicknames.ado
-
 ******************************************
 * Get list of included merges
 ******************************************
