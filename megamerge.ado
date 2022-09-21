@@ -15,7 +15,7 @@ Syntax
 |:-------------------------------|:-------------------------------------------------------------|
 | __trywithout(_var_)__          | try merge without included variable                          |
 | __messy__                      | keep intermediate variables created by megamerge             |
-| __omitmerges(_mergecodes_)__  | do not perform the merges corresponding to the listed codes  |
+| __omitmerges(_merge_codes_)__  | do not perform the merges corresponding to the listed codes  |
 | __keepmerges(_merge_codes_)__  | perform only the merges corresponding to the listed codes    |
 
 
