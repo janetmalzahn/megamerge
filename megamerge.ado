@@ -1,10 +1,10 @@
 /***
-_version 1.2_ 
+_version 1.3_ 
 
 megamerge
 ===== 
 
-__megamerge__ performs up to 16 1:1 merges sequentially to exhaustively link data with names and additional variables. 
+__megamerge__ performs up to 16 merges sequentially to exhaustively link data with names and additional variables. 
 
 Syntax
 ------ 
@@ -17,6 +17,7 @@ Syntax
 | __messy__                      | keep intermediate variables created by megamerge             |
 | __omitmerges(_merge_codes_)__  | do not perform the merges corresponding to the listed codes  |
 | __keepmerges(_merge_codes_)__  | perform only the merges corresponding to the listed codes    |
+| __mergetype(_mergetype_)__    | specify whether megamerge should m:1 or m:1
 
 
 Description
@@ -36,6 +37,8 @@ __messy__ specifies that all variables created by megamerge (and all from using 
 __keepmerges(_mergecodes_)__ specifies that only merges corresponding to _merge_codes_ be run. This option supercedes omitmerges().
 
 __omitmerges(_mergecode_)__ specifies that merges corresponding to the _merge_codes_ (detailed below) be skipped.
+
+__mergetype(_mergetype_)__ specifies whether megamerge should implement a m:1 (duplicates in the master) or a 1:m (duplicates in the using) merge instead of the 1:1 default.
 
 
 Merge Codes
@@ -64,7 +67,7 @@ Merge Codes
 | 200            | unmatched observations from using data                                    |
 | 201            | omitted duplicate observations from using data (unmatched)                |
 
-Remarks
+Process
 -------
 
 Each phase of megamerge consists of the following steps
@@ -75,6 +78,13 @@ Each phase of megamerge consists of the following steps
 5. Perform a 1:1 merge of master to using on the variable list for that merge
 6. Append matched observations with a merge_code to indicate which merge a match came from to prior matched observations.
 7. Separate out observations that were not matched from master and using for use in the next merge.
+
+Remarks
+-------
+
+The "m:1" and "1:m" merge options allow for duplicate observations, however, observations are only grouped together as duplicates if they match on last, first, middle, suffix, and all provided merge variables. Observations that would be considered duplicates for later stage merges (say, on first, last, and merge variables) but differ on other relevant variables (say different middles) would not be considered separate observations from the perspective of megamerge.
+
+
 
 Example(s)
 ----------
@@ -130,7 +140,7 @@ program define megamerge
 version 15.1
 
 * define the syntax
-syntax varlist using/ [, trywithout(string) messy omitmerges(string) keepmerges(string)]
+syntax varlist using/ [, trywithout(string) messy omitmerges(string) keepmerges(string) mergetype(string)]
 
 * arguments: master using varlist
 ** master = master dataset
@@ -167,7 +177,6 @@ describe, varlist
 local mastervars = "`r(varlist)'"
 
 di "`mastervars'"
-*di "`replace'"
 
 * make all name info uppercase
 * make upper case
@@ -208,9 +217,28 @@ forvalues x = 1/`n'{
 	replace hyphen_last = hyphen`x' if hyphen`x' != "" // replace last_last with last
 }
 
-* save the using data
-tempfile master_merge_unmatched
-save `master_merge_unmatched'
+* handle m:1 option
+* if m:1 merge
+if "`mergetype'" == "m:1"{
+	* generate group variable id on full varlist for merges
+	egen megamerge_master_id = group(`varlist' last first middle suffix), missing autotype
+	bys megamerge_master_id: gen obs_duplicate = 1 if _n != 1
+	* save off full unmatched list
+	tempfile master_m1_dups
+	save `master_m1_dups'
+	* subset to just one observation for each combination of merge vars
+	bys megamerge_master_id: keep if _n == 1
+	* save
+	tempfile master_merge_unmatched
+	save `master_merge_unmatched'
+}
+else{
+	* save the using data for a 1:1 or a 1:m merge
+	gen megamerge_master_id = .
+	tempfile master_merge_unmatched
+	save `master_merge_unmatched'
+}
+
 
 **********************************
 * Preclean Using
@@ -256,6 +284,29 @@ gen hyphen_last = hyphen1 // instantiate last_last
 forvalues x = 1/`n'{
 	replace hyphen_last = hyphen`x' if hyphen`x' != "" // replace last_last with last
 }
+
+* handle 1:m option
+* if m:1 merge
+if "`mergetype'" == "1:m"{
+	* generate group variable id on full varlist for merges
+	egen megamerge_using_id = group(`varlist' last first middle suffix), missing autotype
+	bys megamerge_using_id: gen obs_duplicate = 0 if _n != 1
+	* save off full unmatched list
+	tempfile using_1m_dups
+	save `using_1m_dups'
+	* subset to just one observation for each combination of merge vars
+	bys megamerge_using_id: keep if _n == 1
+	* save
+	tempfile using_merge_unmatched
+	save `using_merge_unmatched'
+}
+else{
+	* save the using data for a 1:1 or a m:1 merge 
+	gen megamerge_using_id = . 
+	tempfile using_merge_unmatched
+	save `using_merge_unmatched'
+}
+
 
 * save the using data
 tempfile using_merge_unmatched
@@ -321,7 +372,7 @@ foreach i in `included_merges' {
 	else if `i' == 14{
 		local merge_varlist last
 	}
-	
+	* perform merge step
 	if `i' != 15{
 		* perform merge step
 		minimerge `varlist', extravars(`merge_varlist')  ///
@@ -374,6 +425,39 @@ append using `master_merge_unmatched'
 append using `all_duplicates_using'
 append using `merge_matched'
 
+********************************************************************************
+* Handle special merges
+********************************************************************************
+* many to one merge back to duplicated results
+if "`mergetype'" == "m:1"{
+	preserve 
+	keep if megamerge_master_id == .
+	tempfile no_m1_master_id
+	save `no_m1_master_id'
+	restore
+	keep `usingvars' megamerge_master_id merge_code obs_duplicate // keep relevant vars
+	drop if megamerge_master_id == .
+	merge 1:m megamerge_master_id using `master_m1_dups'
+	* check to make sure there are no unmatched observations in using
+	drop _merge
+	duplicates report megamerge_master_id
+	append using `no_m1_master_id'
+}
+* one to many merge back to duplicated results
+if "`mergetype'" == "1:m"{
+	preserve 
+	keep if megamerge_using_id == .
+	tempfile no_1m_using_id
+	save `no_1m_using_id'
+	restore
+	keep `master_vars' megamerge_using_id merge_code obs_duplicate // keep relevant vars
+	drop if megamerge_using_id == .
+	merge 1:m megamerge_using_id using `using_1m_dups'
+	* check to make sure there are no unmatched obs in master
+	drop _merge
+	duplicates report megamerge_using_id
+	append using `no_1m_using_id'
+}
 ***********************************************
 * Clean up code for messy option
 ***********************************************
@@ -418,7 +502,7 @@ label define match_code  1 "Not matched from master" ///
 					     3 "Matched"
 label values matched match_code		
 
-order `mastervars' `replace' merge_code matched		 
+order `mastervars' `replace' merge_code matched 
 
 tab merge_code
 tab matched

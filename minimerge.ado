@@ -53,8 +53,8 @@ if strpos("`extravars'", "appended_lastmiddle") > 0{
 * tag duplicates in using
 duplicates tag `merge_varlist', gen(dup)
 preserve // get dataset with just duplicates
-	keep if dup > 0 // separate out duplicates
-	save `all_duplicates_using', replace
+keep if dup > 0 // separate out duplicates
+save `all_duplicates_using', replace
 restore
 
 drop if dup != 0
@@ -102,8 +102,8 @@ if strpos("`extravars'", "appended_lastmiddle") > 0{
 * tag initial duplicates in master
 duplicates tag `merge_varlist', gen(dup)
 preserve // get dataset with just duplicates
-	keep if dup > 0 // separate out duplicates
-	save `all_duplicates_master', replace
+keep if dup > 0 // separate out duplicates
+save `all_duplicates_master', replace
 restore
 
 drop if dup != 0

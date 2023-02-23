@@ -1,11 +1,11 @@
 {smcl}
-{it:version 1.2} 
+{it:version 1.3} 
 
 
 {title:megamerge}
 
 {p 4 4 2}
-{bf:megamerge} performs up to 16 1:1 merges sequentially to exhaustively link data with names and additional variables. 
+{bf:megamerge} performs up to 16 merges sequentially to exhaustively link data with names and additional variables. 
 
 
 {title:Syntax}
@@ -16,8 +16,9 @@
 {space 4}{hline}
 {col 5}{bf:trywithout({it:var})}{col 37}try merge without included variable
 {col 5}{bf:messy}{col 37}keep intermediate variables created by megamerge
-{col 5}{bf:omitmerges({it:mergecodes})}{col 37}do not perform the merges corresponding to the listed codes
+{col 5}{bf:omitmerges({it:merge_codes})}{col 37}do not perform the merges corresponding to the listed codes
 {col 5}{bf:keepmerges({it:merge_codes})}{col 37}perform only the merges corresponding to the listed codes
+{col 5}{bf:mergetype({it:mergetype})}{col 37}specify whether megamerge should m:1 or m:1
 {space 4}{hline}
 
 
@@ -43,6 +44,9 @@ Each merge is in decreasing levels of specificity, so observations are matched o
 
 {p 4 4 2}
 {bf:omitmerges({it:mergecode})} specifies that merges corresponding to the {it:merge_codes} (detailed below) be skipped.
+
+{p 4 4 2}
+{bf:mergetype({it:mergetype})} specifies whether megamerge should implement a m:1 (duplicates in the master) or a 1:m (duplicates in the using) merge instead of the 1:1 default.
 
 
 
@@ -72,7 +76,7 @@ Each merge is in decreasing levels of specificity, so observations are matched o
 {col 5}201{col 21}omitted duplicate observations from using data (unmatched)
 {space 4}{hline}
 
-{title:Remarks}
+{title:Process}
 
 {p 4 4 2}
 Each phase of megamerge consists of the following steps
@@ -83,6 +87,14 @@ Each phase of megamerge consists of the following steps
 {break}    5. Perform a 1:1 merge of master to using on the variable list for that merge
 {break}    6. Append matched observations with a merge_code to indicate which merge a match came from to prior matched observations.
 {break}    7. Separate out observations that were not matched from master and using for use in the next merge.
+
+
+{title:Remarks}
+
+{p 4 4 2}
+The "m:1" and "1:m" merge options allow for duplicate observations, however, observations are only grouped together as duplicates if they match on last, first, middle, suffix, and all provided merge variables. Observations that would be considered duplicates for later stage merges (say, on first, last, and merge variables) but differ on other relevant variables (say different middles) would not be considered separate observations from the perspective of megamerge.
+
+
 
 
 {title:Example(s)}
