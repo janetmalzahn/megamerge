@@ -23,6 +23,13 @@ use `using_merge_unmatched'
 capture append using `all_duplicates_using'
 capture drop dup // drop dup previously generated
 
+* check if zero observations left in using
+if _N == 0{
+	di "no using"
+	clear
+	exit, clear
+}
+
 if strpos("`extravars'", "nohyphen_last") > 0{
 	di "nohyphen"
 	* make hyphenless last
@@ -71,6 +78,11 @@ use `master_merge_unmatched'
 * add previous duplicates dropped because they might be useful
 capture append using `all_duplicates_master'
 capture drop dup // drop dup previously generated
+
+if _N == 0{
+	di "no master"
+	exit, clear
+}
 
 if strpos("`extravars'", "nohyphen_last") > 0{
 	di "nohyphen"

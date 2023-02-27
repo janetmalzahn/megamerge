@@ -61,8 +61,14 @@ program define replace_nicknames
 	replace fake_first = "ROD" if inlist(first, "RODNEY", "RODDY")
 	replace fake_first = "DEN" if inlist(first, "DENNIS", "DENNY", "DENISE", "DENNIE", "DENISSE", "DENNISE", "DENIS")
 	replace fake_first = "LOU" if inlist(first, "LOUIS", "LOUIE", "LOU")
-	
-	
-	
+	replace fake_first = "TOM" if inlist(first, "TOM", "THOMAS", "TOMMIE", "TOMMY", "THOM", "TOMAS", "THOMMY")
+	replace fake_first = "TIM" if inlist(first, "TIMMY", "TIMOTHY")
+	replace fake_first = "STEVE" if inlist(first, "STEVEN", "STEPHEN", "STEVIE", "STEVEY")
+	replace fake_first = "JAN" if inlist(first, "JANICE", "JANET", "JANNIE", "JANUARY", "JANIS")
+	replace fake_first = "ARCHIE" if first == "ARCHIBALD"
+	replace fake_first = "ART" if first == "ARTHUR"
+	replace fake_first = "GABE" if inlist(first, "GABY", "GABRIELLE", "GABI", "GABRIEL", "GABBY")
+	replace fake_first = "TOBY" if inlist(first, "TOBIAS", "TOBIE")
+	replace fake_first = "FRAN" if inlist(first, "FRANCESCA", "FRANCHESCA", "FRANNY", "FRANNIE", "FRANCES", "FRANKIE", "FRANK")
 	
 end
