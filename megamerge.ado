@@ -17,7 +17,6 @@ Syntax
 | __messy__                      | keep intermediate variables created by megamerge             |
 | __omitmerges(_merge_codes_)__  | do not perform the merges corresponding to the listed codes  |
 | __keepmerges(_merge_codes_)__  | perform only the merges corresponding to the listed codes    |
-| __mergetype(_mergetype_)__    | specify whether megamerge should m:1 or m:1
 
 
 Description
@@ -37,8 +36,6 @@ __messy__ specifies that all variables created by megamerge (and all from using 
 __keepmerges(_mergecodes_)__ specifies that only merges corresponding to _merge_codes_ be run. This option supercedes omitmerges().
 
 __omitmerges(_mergecode_)__ specifies that merges corresponding to the _merge_codes_ (detailed below) be skipped.
-
-__mergetype(_mergetype_)__ specifies whether megamerge should implement a m:1 (duplicates in the master) or a 1:m (duplicates in the using) merge instead of the 1:1 default.
 
 
 Merge Codes
@@ -217,6 +214,7 @@ forvalues x = 1/`n'{
 	replace hyphen_last = hyphen`x' if hyphen`x' != "" // replace last_last with last
 }
 
+/* FOR FUTURE USE
 * handle m:1 option
 * if m:1 merge
 if "`mergetype'" == "m:1"{
@@ -238,6 +236,11 @@ else{
 	tempfile master_merge_unmatched
 	save `master_merge_unmatched'
 }
+*/
+
+* save master file
+tempfile master_merge_unmatched
+save `master_merge_unmatched'
 
 
 **********************************
@@ -285,6 +288,7 @@ forvalues x = 1/`n'{
 	replace hyphen_last = hyphen`x' if hyphen`x' != "" // replace last_last with last
 }
 
+/* FOR FUTURE USE
 * handle 1:m option
 * if m:1 merge
 if "`mergetype'" == "1:m"{
@@ -305,7 +309,7 @@ else{
 	gen megamerge_using_id = . 
 	tempfile using_merge_unmatched
 	save `using_merge_unmatched'
-}
+} */
 
 
 * save the using data
@@ -426,8 +430,9 @@ append using `all_duplicates_using'
 append using `merge_matched'
 
 ********************************************************************************
-* Handle special merges
+* Handle special merges - for future use
 ********************************************************************************
+/*
 * many to one merge back to duplicated results
 if "`mergetype'" == "m:1"{
 	preserve 
@@ -458,6 +463,7 @@ if "`mergetype'" == "1:m"{
 	duplicates report megamerge_using_id
 	append using `no_1m_using_id'
 }
+*/
 ***********************************************
 * Clean up code for messy option
 ***********************************************

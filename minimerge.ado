@@ -5,7 +5,7 @@ program define minimerge
 version 15.1
 
 * define the syntax
-syntax varlist, extravars(string) replace(string) merge_code(int) using_merge_unmatched(string) master_merge_unmatched(string) merge_matched(string) all_duplicates_master(string) all_duplicates_using(string)
+syntax varlist, extravars(string) [replace(string)] merge_code(int) using_merge_unmatched(string) master_merge_unmatched(string) merge_matched(string) all_duplicates_master(string) all_duplicates_using(string)
 
 *------------------------------------------
 * make merge_varlist
