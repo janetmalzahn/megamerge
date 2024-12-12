@@ -1,4 +1,4 @@
-*version 1.2*
+*version 1.3*
 
 megamerge
 =========
@@ -22,7 +22,7 @@ Syntax
   **omitmerges**(*mergecod do not perform the merges corresponding to the
   es*)                     listed codes
 
-  **keepmerges**(*merge\_c perform only the merges corresponding to the
+  **keepmerges**(*mergec   perform only the merges corresponding to the
   odes*)                   listed codes
   ------------------------------------------------------------------------
 
