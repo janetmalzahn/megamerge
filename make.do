@@ -11,5 +11,4 @@ make megamerge, replace toc pkg  version(1.3)                                ///
      url("")                                                                 ///
      title("megamerge")                                                      ///
      description("15 1:1 merges sequentially to exhaustively link data with sequential merges for matching data with names") ///
-     install("megamerge.ado;minimerge.ado;replace_nicknames.ado;megamerge.sthlp") ///
-     iancillary("")                                                         
+     install("megamerge.ado;minimerge.ado;replace_nicknames.ado;megamerge.sthlp";"extrname_clean.ado";"extrname_clean.sthlp";"checkdrop.ado") 

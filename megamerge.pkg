@@ -1,15 +1,15 @@
 v 1.3
 d 'MEGAMERGE': megamerge
 d 
-d 30 1:1 merges sequentially to exhaustively link data with sequential merges for matching data with names
+d 15 1:1 merges sequentially to exhaustively link data with sequential merges for matching data with names
 d 
 d Distribution-Date:   20241212
 d License: MIT
 d 
-F megamerge.ado
-F megamerge.sthlp
-F minimerge.ado
-F replace_nicknames.ado
+F checkdrop.ado
 F extrname_clean.ado
 F extrname_clean.sthlp
-F checkdrop.ado
+F megamerge.ado
+F megamerge.sthlp 
+F minimerge.ado
+F replace_nicknames.ado
