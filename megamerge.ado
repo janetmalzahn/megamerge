@@ -137,7 +137,7 @@ program define megamerge
 version 15.1
 
 * define the syntax
-syntax varlist using/ [, trywithout(string) messy omitmerges(string) keepmerges(string) mergetype(string)]
+syntax varlist using/ [, trywithout(string) messy omitmerges(string) keepmerges(string)]
 
 * arguments: master using varlist
 ** master = master dataset
@@ -168,6 +168,10 @@ else{
 *****************************
 * Preclean Master
 *****************************
+
+* drop initial variables
+check_drop merge_code merge matched initial last1 last2 last3 last4 last_last hyphen hyphen1 hyphen2 hyphen3 hyphen_parts, dataset(using)
+
 
 * get list of variables originally present in master
 describe, varlist
@@ -248,6 +252,9 @@ save `master_merge_unmatched'
 **********************************
 
 use `using', clear
+
+// List of variables to check
+check_drop merge_code merge matched initial last1 last2 last3 last4 last_last hyphen hyphen1 hyphen2 hyphen3 hyphen_parts, dataset(using)
 
 * get list of variables originally present in master
 describe, varlist
