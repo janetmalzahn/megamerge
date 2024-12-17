@@ -1,5 +1,5 @@
 /***
-_version 1.4_ 
+_version 1.41_ 
 
 megamerge
 ===== 
@@ -170,7 +170,7 @@ else{
 *****************************
 
 * drop initial variables
-checkdrop merge_code merge matched initial last1 last2 last3 last4 last_last hyphen hyphen1 hyphen2 hyphen3 hyphen_parts, dataset(using)
+checkdrop merge_code merge _merge matched initial last1 last2 last3 last4 last_last hyphen hyphen1 hyphen2 hyphen3 hyphen_parts, dataset(using)
 
 
 * get list of variables originally present in master
