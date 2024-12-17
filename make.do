@@ -3,7 +3,7 @@
 // DO NOT FORGET to update the version of the package, if changed!
 // for more information visit http://github.com/haghish/github
 
-make megamerge, replace toc pkg  version(1.3)                                ///
+make megamerge, replace toc pkg  version(1.4)                                ///
      license("MIT")                                                          ///
      author("Janet Malzahn")                                                 ///
      affiliation("Stanford Institute for Economic Policy Research")          ///

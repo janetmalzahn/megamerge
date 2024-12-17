@@ -1,4 +1,4 @@
-*version 1.3*
+*version 1.4*
 
 megamerge
 =========
@@ -11,9 +11,9 @@ Syntax
 
 > **megamerge** *varlist* using *filename* \[, *options*\]
 
-  ------------------------------------------------------------------------
+------------------------------------------------------------------------
   *options*                *Description*
-  ------------------------ -----------------------------------------------
+------------------------ -----------------------------------------------
   **trywithout(*var*)**    try merge without included variable
 
   **messy**                keep intermediate variables created by
@@ -60,10 +60,10 @@ variables originally in master and using.
 Merge Codes
 -----------
 
-  ------------------------------------------------------------------------
+------------------------------------------------------------------------
   **merge       **explanation**
   code**        
-  ------------- ----------------------------------------------------------
+------------- ----------------------------------------------------------
   0             merge vars + first + last + middle + suffix
 
   1             merge vars + first + last + suffix
@@ -130,23 +130,23 @@ Example(s)
 ----------
 
     performs a megamerge of data in memory to data2 on name vars, state, and dist to get pop
-
+    
             . megamerge state dist using data2
-
+    
     performs same megamerge, but tries a round without the district variable
-
+    
             . megamerge state dist using data2, trywithout(dist)
                     
     performs same megamerge, but only on last name and on last and initial
-
+    
             . megamerge state dist using data2, trywithout(dist) keepmerges(7 14)
                     
     performs same megamerge, but without a merge on nicknames
-
+    
             . megamerge state dist using data2, trywithout(dist) omitmerge(8)
                     
             performs same megamerge, but keeps all intermediate variables
-
+    
             . megamerge state dist using data2, trywithout(dist) messy
 
 Author
