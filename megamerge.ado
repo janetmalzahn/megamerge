@@ -337,6 +337,29 @@ tempfile merge_matched
 tempfile using_nodups
 
 foreach i in `included_merges' {
+
+	* Check if there are observations left to match
+	* If either master or using is empty, skip remaining merges
+	capture use `master_merge_unmatched', clear
+	if _rc == 0 {
+		local master_n = _N
+	}
+	else {
+		local master_n = 0
+	}
+	capture use `using_merge_unmatched', clear
+	if _rc == 0 {
+		local using_n = _N
+	}
+	else {
+		local using_n = 0
+	}
+
+	if `master_n' == 0 | `using_n' == 0 {
+		di "No more observations to match. Skipping remaining merges."
+		continue, break
+	}
+
 	di `i'
 	if `i' == 0 {
 		local merge_varlist "last first middle suffix"
@@ -519,9 +542,6 @@ order `mastervars' `replace' merge_code matched
 
 tab merge_code
 tab matched
-
-
-
 
 
 end
