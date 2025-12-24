@@ -17,6 +17,7 @@ Syntax
 | __messy__                      | keep intermediate variables created by megamerge             |
 | __omitmerges(_merge_codes_)__  | do not perform the merges corresponding to the listed codes  |
 | __keepmerges(_merge_codes_)__  | perform only the merges corresponding to the listed codes    |
+| __verbose__                    | show all intermediate output (default shows progress bar)    |
 
 
 Description
@@ -36,6 +37,8 @@ __messy__ specifies that all variables created by megamerge (and all from using 
 __keepmerges(_mergecodes_)__ specifies that only merges corresponding to _merge_codes_ be run. This option supercedes omitmerges().
 
 __omitmerges(_mergecode_)__ specifies that merges corresponding to the _merge_codes_ (detailed below) be skipped.
+
+__verbose__ displays all intermediate output from each merge step. By default, megamerge shows a progress bar during execution and only displays the final results summary.
 
 
 Merge Codes
@@ -137,7 +140,15 @@ program define megamerge
 version 15.1
 
 * define the syntax
-syntax varlist using/ [, trywithout(string) messy omitmerges(string) keepmerges(string)]
+syntax varlist using/ [, trywithout(string) messy omitmerges(string) keepmerges(string) verbose]
+
+* Set up quiet mode prefix (default suppresses intermediate output)
+if "`verbose'" == "" {
+	local quiet_prefix "quietly"
+}
+else {
+	local quiet_prefix ""
+}
 
 * arguments: master using varlist
 ** master = master dataset
@@ -170,18 +181,20 @@ else{
 *****************************
 
 * drop initial variables
-checkdrop merge_code merge _merge matched initial last1 last2 last3 last4 last_last hyphen hyphen1 hyphen2 hyphen3 hyphen_parts, dataset(using)
+`quiet_prefix' checkdrop merge_code merge _merge matched initial last1 last2 last3 last4 last_last hyphen hyphen1 hyphen2 hyphen3 hyphen_parts, dataset(using)
 
 
 * get list of variables originally present in master
-describe, varlist
+`quiet_prefix' describe, varlist
 local mastervars = "`r(varlist)'"
 
-di "`mastervars'"
+if "`verbose'" != "" {
+	di "`mastervars'"
+}
 
 * make all name info uppercase
 * make upper case
-foreach var of varlist first middle last suffix {
+`quiet_prefix' foreach var of varlist first middle last suffix {
 	replace `var' = upper(`var')
 	replace `var' = subinstr(`var', ".", "", .)
 	replace `var' = subinstr(`var', `"""', "", .)
@@ -192,30 +205,30 @@ foreach var of varlist first middle last suffix {
 * initial duplicates for master
 
 * get first initial
-capture gen initial = substr(first,1,1)
+`quiet_prefix' capture gen initial = substr(first,1,1)
 
 * gen middle initial
-capture gen middle_init = substr(middle,1,1)
+`quiet_prefix' capture gen middle_init = substr(middle,1,1)
 
 
-* get parts of last name 
-split last, gen(last) // split last name into each part
-gen last_parts = length(last) - length(subinstr(last, " ", "", .)) + 1 // get number of last name parts 
-quietly summarize(last_parts) // enable r(max)
-local n `r(max)' // store r(max)
-gen last_last = last1 // instantiate last_last
-forvalues x = 1/`n'{
-	replace last_last = last`x' if last`x' != "" // replace last_last with last
+* get parts of last name
+`quiet_prefix' split last, gen(last)
+`quiet_prefix' gen last_parts = length(last) - length(subinstr(last, " ", "", .)) + 1
+quietly summarize(last_parts)
+local n `r(max)'
+`quiet_prefix' gen last_last = last1
+`quiet_prefix' forvalues x = 1/`n'{
+	replace last_last = last`x' if last`x' != ""
 }
 
-* gets hyphen parts of lastname 
-split last, parse("-") generate(hyphen) // split by hyphen
-gen hyphen_parts = length(last) - length(subinstr(last, "-", "", .)) + 1 // get number of hyphen parts
-quietly summarize(hyphen_parts) // enable r(max)
-local n `r(max)' // store r(max)
-gen hyphen_last = hyphen1 // instantiate last_last
-forvalues x = 1/`n'{
-	replace hyphen_last = hyphen`x' if hyphen`x' != "" // replace last_last with last
+* gets hyphen parts of lastname
+`quiet_prefix' split last, parse("-") generate(hyphen)
+`quiet_prefix' gen hyphen_parts = length(last) - length(subinstr(last, "-", "", .)) + 1
+quietly summarize(hyphen_parts)
+local n `r(max)'
+`quiet_prefix' gen hyphen_last = hyphen1
+`quiet_prefix' forvalues x = 1/`n'{
+	replace hyphen_last = hyphen`x' if hyphen`x' != ""
 }
 
 /* FOR FUTURE USE
@@ -244,24 +257,24 @@ else{
 
 * save master file
 tempfile master_merge_unmatched
-save `master_merge_unmatched'
+`quiet_prefix' save `master_merge_unmatched'
 
 
 **********************************
 * Preclean Using
 **********************************
 
-use `using', clear
+`quiet_prefix' use `using', clear
 
-// List of variables to check
-checkdrop merge_code merge matched initial last1 last2 last3 last4 last_last hyphen hyphen1 hyphen2 hyphen3 hyphen_parts, dataset(using)
+* List of variables to check
+`quiet_prefix' checkdrop merge_code merge matched initial last1 last2 last3 last4 last_last hyphen hyphen1 hyphen2 hyphen3 hyphen_parts, dataset(using)
 
-* get list of variables originally present in master
-describe, varlist
-local usingvars = "`r(varlist)'" 
+* get list of variables originally present in using
+`quiet_prefix' describe, varlist
+local usingvars = "`r(varlist)'"
 
 * make all variables uppercase and drop periods
-foreach var of varlist first middle last suffix {
+`quiet_prefix' foreach var of varlist first middle last suffix {
 	replace `var' = upper(`var')
 	replace `var' = subinstr(`var', ".", "", .)
 	replace `var' = subinstr(`var', `"""', "", .)
@@ -270,29 +283,29 @@ foreach var of varlist first middle last suffix {
 }
 
 * get first initial
-capture gen initial = substr(first,1,1)
+`quiet_prefix' capture gen initial = substr(first,1,1)
 
 * gen middle initial
-capture gen middle_init = substr(middle,1,1)
+`quiet_prefix' capture gen middle_init = substr(middle,1,1)
 
-* get parts of last name 
-split last, gen(last) // split last name into each part
-gen last_parts = length(last) - length(subinstr(last, " ", "", .)) + 1 // get number of last name parts 
-quietly summarize(last_parts) // enable r(max)
-local n `r(max)' // store r(max)
-gen last_last = last1 // instantiate last_last
-forvalues x = 1/`n'{
-	replace last_last = last`x' if last`x' != "" // replace last_last with last
+* get parts of last name
+`quiet_prefix' split last, gen(last)
+`quiet_prefix' gen last_parts = length(last) - length(subinstr(last, " ", "", .)) + 1
+quietly summarize(last_parts)
+local n `r(max)'
+`quiet_prefix' gen last_last = last1
+`quiet_prefix' forvalues x = 1/`n'{
+	replace last_last = last`x' if last`x' != ""
 }
 
-* gets hyphen parts of lastname 
-split last, parse("-") generate(hyphen) // split by hyphen
-gen hyphen_parts = length(last) - length(subinstr(last, "-", "", .)) + 1 // get number of hyphen parts
-quietly summarize(hyphen_parts) // enable r(max)
-local n `r(max)' // store r(max)
-gen hyphen_last = hyphen1 // instantiate last_last
-forvalues x = 1/`n'{
-	replace hyphen_last = hyphen`x' if hyphen`x' != "" // replace last_last with last
+* gets hyphen parts of lastname
+`quiet_prefix' split last, parse("-") generate(hyphen)
+`quiet_prefix' gen hyphen_parts = length(last) - length(subinstr(last, "-", "", .)) + 1
+quietly summarize(hyphen_parts)
+local n `r(max)'
+`quiet_prefix' gen hyphen_last = hyphen1
+`quiet_prefix' forvalues x = 1/`n'{
+	replace hyphen_last = hyphen`x' if hyphen`x' != ""
 }
 
 /* FOR FUTURE USE
@@ -321,7 +334,7 @@ else{
 
 * save the using data
 tempfile using_merge_unmatched
-save `using_merge_unmatched'
+`quiet_prefix' save `using_merge_unmatched'
 
 ****************************************
 * Make replace varlist
@@ -336,7 +349,28 @@ tempfile all_duplicates_master
 tempfile merge_matched
 tempfile using_nodups
 
+* Count total merges for progress bar
+local total_merges : word count `included_merges'
+local current_merge = 0
+
+* Display header for progress (default mode shows progress bar)
+if "`verbose'" == "" {
+	di as text _n "Running megamerge..."
+	di as text "Progress: " _continue
+}
+
 foreach i in `included_merges' {
+
+	* Update progress counter
+	local current_merge = `current_merge' + 1
+
+	* Show progress indicator (default mode) or merge number (verbose mode)
+	if "`verbose'" == "" {
+		di as text "." _continue
+	}
+	else {
+		di as text _n "Merge `i' (`current_merge' of `total_merges')"
+	}
 
 	* Check if there are observations left to match
 	* If either master or using is empty, skip remaining merges
@@ -356,11 +390,11 @@ foreach i in `included_merges' {
 	}
 
 	if `master_n' == 0 | `using_n' == 0 {
-		di "No more observations to match. Skipping remaining merges."
+		if "`verbose'" != "" {
+			di "No more observations to match. Skipping remaining merges."
+		}
 		continue, break
 	}
-
-	di `i'
 	if `i' == 0 {
 		local merge_varlist "last first middle suffix"
 	}
@@ -409,7 +443,7 @@ foreach i in `included_merges' {
 	* perform merge step
 	if `i' != 15{
 		* perform merge step
-		minimerge `varlist', extravars(`merge_varlist')  ///
+		`quiet_prefix' minimerge `varlist', extravars(`merge_varlist')  ///
 		replace(`replace') merge_code(`i')  ///
 		using_merge_unmatched(`using_merge_unmatched') ///
 		master_merge_unmatched(`master_merge_unmatched') merge_matched(`merge_matched') ///
@@ -420,44 +454,49 @@ foreach i in `included_merges' {
 		if "`trywithout'" != "" {
 			foreach item in `trywithout'{
 				local tempvarlist : list varlist - item // get og varlist minus trywithout var
-				minimerge `tempvarlist', extravars(last first) replace(`replace') /// 
+				`quiet_prefix' minimerge `tempvarlist', extravars(last first) replace(`replace') ///
 					merge_code(`i') using_merge_unmatched(`using_merge_unmatched')  ///
 					master_merge_unmatched(`master_merge_unmatched')  ///
 					merge_matched(`merge_matched') all_duplicates_using(`all_duplicates_using') ///
-					all_duplicates_master(`all_duplicates_master') 
+					all_duplicates_master(`all_duplicates_master')
 			}
 		}
 	}
-	
+
+}
+
+* End progress bar with newline
+if "`verbose'" == "" {
+	di as text " Done."
 }
 
 *************************************************
 * Append remaining datasets
 *************************************************
 * generate merge_code for using unmatched
-use `using_merge_unmatched'
-capture gen merge_code = 200
-save `using_merge_unmatched', replace
+`quiet_prefix' use `using_merge_unmatched'
+`quiet_prefix' capture gen merge_code = 200
+`quiet_prefix' save `using_merge_unmatched', replace
 
 * generate merge_code for master unmatched
-use `master_merge_unmatched'
-capture gen merge_code = 100
-save `master_merge_unmatched', replace
+`quiet_prefix' use `master_merge_unmatched'
+`quiet_prefix' capture gen merge_code = 100
+`quiet_prefix' save `master_merge_unmatched', replace
 
 * generate merge_code for using duplicates
-use `all_duplicates_using'
-capture gen merge_code = 201
-save `all_duplicates_using', replace
+`quiet_prefix' use `all_duplicates_using'
+`quiet_prefix' capture gen merge_code = 201
+`quiet_prefix' save `all_duplicates_using', replace
 
 * generate merge_code for master duplicates
-use `all_duplicates_master'
-capture gen merge_code = 101
-save `all_duplicates_master', replace
+`quiet_prefix' use `all_duplicates_master'
+`quiet_prefix' capture gen merge_code = 101
+`quiet_prefix' save `all_duplicates_master', replace
 
-append using `using_merge_unmatched'
-append using `master_merge_unmatched'
-append using `all_duplicates_using'
-append using `merge_matched'
+`quiet_prefix' append using `using_merge_unmatched'
+`quiet_prefix' append using `master_merge_unmatched'
+`quiet_prefix' append using `all_duplicates_using'
+`quiet_prefix' append using `merge_matched'
 
 ********************************************************************************
 * Handle special merges - for future use
@@ -500,18 +539,18 @@ if "`mergetype'" == "1:m"{
 * keep variables in master and variables of interest from using
 if "`messy'" == ""{
 	local keep_vars : list mastervars | usingvars
-	keep `keep_vars' merge_code
+	`quiet_prefix' keep `keep_vars' merge_code
 }
 
 ***********************************************
 * Label merge_code
 ***********************************************
 
-gen matched = 1 if merge_code < 200 & merge_code >= 100
-replace matched = 2 if merge_code >= 200  
-replace matched = 3 if merge_code < 20
+`quiet_prefix' gen matched = 1 if merge_code < 200 & merge_code >= 100
+`quiet_prefix' replace matched = 2 if merge_code >= 200
+`quiet_prefix' replace matched = 3 if merge_code < 20
 
-label define merge_labs  0 "0: all" /// 
+`quiet_prefix' label define merge_labs  0 "0: all" ///
 						 1 "1: all - middle" ///
 						 2 "2: all - suffix" ///
 						 3 "3: vars + middle_init + first + last" ///
@@ -531,15 +570,19 @@ label define merge_labs  0 "0: all" ///
 						 201 "201: omitted duplicate from using" ///
 						 100 "100: unmatched from master" ///
 						 101 "101: omitted duplicate from master"
-label values merge_code merge_labs
+`quiet_prefix' label values merge_code merge_labs
 
-label define match_code  1 "Not matched from master" ///
+`quiet_prefix' label define match_code  1 "Not matched from master" ///
 					     2 "Not matched from using" ///
 					     3 "Matched"
-label values matched match_code		
+`quiet_prefix' label values matched match_code
 
-order `mastervars' `replace' merge_code matched 
+`quiet_prefix' order `mastervars' `replace' merge_code matched
 
+* Final summary output (always shown)
+di as text _n "============================================"
+di as text "MEGAMERGE RESULTS"
+di as text "============================================"
 tab merge_code
 tab matched
 
