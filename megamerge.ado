@@ -150,10 +150,141 @@ else {
 	local quiet_prefix ""
 }
 
-* arguments: master using varlist
-** master = master dataset
-** using = using dataset
-** varlist = varlist for merge 
+******************************************
+* Input Validation
+******************************************
+
+* Check using file exists
+capture confirm file "`using'"
+if _rc != 0 {
+	di as error "Error: Using file not found: `using'"
+	exit 601
+}
+
+* Check master dataset is not empty
+if _N == 0 {
+	di as error "Error: Master dataset has no observations"
+	exit 2000
+}
+
+* Check required name variables exist in master
+local required_vars "first last middle suffix"
+foreach var of local required_vars {
+	capture confirm variable `var'
+	if _rc != 0 {
+		di as error "Error: Required variable '`var'' not found in master dataset"
+		di as error "megamerge requires variables: first, last, middle, suffix"
+		exit 111
+	}
+}
+
+* Check varlist variables exist in master
+* Note: This is redundant since Stata's syntax command validates varlist automatically,
+* but we keep it as a safety net and for consistency with the using dataset check
+foreach var of local varlist {
+	capture confirm variable `var'
+	if _rc != 0 {
+		di as error "Error: Merge variable '`var'' not found in master dataset"
+		exit 111
+	}
+}
+
+* Check name variables are string type in master
+foreach var of local required_vars {
+	capture confirm string variable `var'
+	if _rc != 0 {
+		di as error "Error: Variable '`var'' must be string type in master dataset"
+		di as error "Use: tostring `var', replace"
+		exit 109
+	}
+}
+
+* Validate using dataset
+preserve
+quietly use "`using'", clear
+
+* Check using dataset is not empty
+if _N == 0 {
+	di as error "Error: Using dataset has no observations"
+	restore
+	exit 2000
+}
+
+* Check required name variables exist in using
+foreach var of local required_vars {
+	capture confirm variable `var'
+	if _rc != 0 {
+		di as error "Error: Required variable '`var'' not found in using dataset"
+		di as error "megamerge requires variables: first, last, middle, suffix"
+		restore
+		exit 111
+	}
+}
+
+* Check varlist variables exist in using
+foreach var of local varlist {
+	capture confirm variable `var'
+	if _rc != 0 {
+		di as error "Error: Merge variable '`var'' not found in using dataset"
+		restore
+		exit 111
+	}
+}
+
+* Check name variables are string type in using
+foreach var of local required_vars {
+	capture confirm string variable `var'
+	if _rc != 0 {
+		di as error "Error: Variable '`var'' must be string type in using dataset"
+		di as error "Use: tostring `var', replace"
+		restore
+		exit 109
+	}
+}
+
+restore
+
+* Validate trywithout option
+if "`trywithout'" != "" {
+	local tw_valid 0
+	foreach var of local varlist {
+		if "`var'" == "`trywithout'" {
+			local tw_valid 1
+		}
+	}
+	if `tw_valid' == 0 {
+		di as error "Error: trywithout variable '`trywithout'' is not in the merge varlist"
+		di as error "trywithout must specify a variable from: `varlist'"
+		exit 111
+	}
+}
+
+* Validate keepmerges option
+if "`keepmerges'" != "" {
+	foreach code of local keepmerges {
+		if `code' < 0 | `code' > 15 {
+			di as error "Error: Invalid merge code `code' in keepmerges"
+			di as error "Valid merge codes are 0-15"
+			exit 125
+		}
+	}
+}
+
+* Validate omitmerges option
+if "`omitmerges'" != "" {
+	foreach code of local omitmerges {
+		if `code' < 0 | `code' > 15 {
+			di as error "Error: Invalid merge code `code' in omitmerges"
+			di as error "Valid merge codes are 0-15"
+			exit 125
+		}
+	}
+}
+
+* Warn if both keepmerges and omitmerges specified
+if "`keepmerges'" != "" & "`omitmerges'" != "" {
+	di as text "Note: Both keepmerges and omitmerges specified. keepmerges takes precedence."
+}
 
 ******************************************
 * Get list of included merges
