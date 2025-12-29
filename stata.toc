@@ -1,6 +1,6 @@
 v 1.50
 d Materials by Janet Malzahn
-d Stanford Institute for Economic Policy Research
+d Stanford Graduate School of Business
 d jmalzahn@stanford.edu
 
 d 'megamerge': 15 1:1 merges sequentially to exhaustively link data with sequential merges for matching data with names

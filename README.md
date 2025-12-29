@@ -142,7 +142,7 @@ Since merges are 1:1, observations that are not unique on the merge variables ar
 ## Author
 
 **Janet Malzahn**
-Stanford Institute for Economic Policy Research
+Stanford Graduate School of Business
 jmalzahn@stanford.edu
 
 ## License

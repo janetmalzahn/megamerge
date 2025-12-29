@@ -128,7 +128,7 @@ Observations are only grouped together as duplicates if they match on last, firs
 
 {p 4 4 2}
 Janet Malzahn    {break}
-Stanford Institute for Economic Policy Research      {break}
+Stanford Graduate School of Business      {break}
 jmalzahn@stanford.edu     {break}
 
 

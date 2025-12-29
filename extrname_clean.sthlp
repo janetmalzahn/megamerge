@@ -53,7 +53,7 @@ If you want to keep these variables, you should rename them before use. Otherwis
 {title:Author}
 
 {pstd}Janet Malzahn{break}
-Stanford Institute for Economic Policy Research{break}
+Stanford Graduate School of Business{break}
 jmalzahn@stanford.edu
 
 {title:License}
