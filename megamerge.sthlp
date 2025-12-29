@@ -1,5 +1,5 @@
 {smcl}
-{it:version 1.41} 
+{it:version 1.50} 
 
 
 {title:megamerge}
@@ -18,7 +18,7 @@
 {col 5}{bf:messy}{col 37}keep intermediate variables created by megamerge
 {col 5}{bf:omitmerges({it:merge_codes})}{col 37}do not perform the merges corresponding to the listed codes
 {col 5}{bf:keepmerges({it:merge_codes})}{col 37}perform only the merges corresponding to the listed codes
-{col 5}{bf:mergetype({it:mergetype})}{col 37}specify whether megamerge should m:1 or m:1
+{col 5}{bf:verbose}{col 37}show all intermediate output (default shows progress bar)
 {space 4}{hline}
 
 
@@ -46,7 +46,7 @@ Each merge is in decreasing levels of specificity, so observations are matched o
 {bf:omitmerges({it:mergecode})} specifies that merges corresponding to the {it:merge_codes} (detailed below) be skipped.
 
 {p 4 4 2}
-{bf:mergetype({it:mergetype})} specifies whether megamerge should implement a m:1 (duplicates in the master) or a 1:m (duplicates in the using) merge instead of the 1:1 default.
+{bf:verbose} displays all intermediate output from each merge step. By default, megamerge shows a progress bar during execution and only displays the final results summary.
 
 
 
@@ -92,7 +92,7 @@ Each phase of megamerge consists of the following steps
 {title:Remarks}
 
 {p 4 4 2}
-The "m:1" and "1:m" merge options allow for duplicate observations, however, observations are only grouped together as duplicates if they match on last, first, middle, suffix, and all provided merge variables. Observations that would be considered duplicates for later stage merges (say, on first, last, and merge variables) but differ on other relevant variables (say different middles) would not be considered separate observations from the perspective of megamerge.
+Observations are only grouped together as duplicates if they match on last, first, middle, suffix, and all provided merge variables. Observations that would be considered duplicates for later stage merges (say, on first, last, and merge variables) but differ on other relevant variables (say different middles) would not be considered separate observations from the perspective of megamerge.
 
 
 
@@ -113,12 +113,15 @@ The "m:1" and "1:m" merge options allow for duplicate observations, however, obs
 		
     performs same megamerge, but without a merge on nicknames
 
-        . megamerge state dist using data2, trywithout(dist) omitmerge(8)
-		
-{p 4 4 2}
-	performs same megamerge, but keeps all intermediate variables
+        . megamerge state dist using data2, trywithout(dist) omitmerges(8)
+
+    performs same megamerge, but keeps all intermediate variables
 
         . megamerge state dist using data2, trywithout(dist) messy
+
+    performs same megamerge, but shows detailed output for each merge phase
+
+        . megamerge state dist using data2, verbose
 
 
 {title:Author}
@@ -132,13 +135,13 @@ jmalzahn@stanford.edu     {break}
 {title:License}
 
 {p 4 4 2}
-Specify the license of the software
+MIT
 
 
 {title:References}
 
 {p 4 4 2}
-Janet Malzahn (2022),  {browse "https://github.com/haghish/markdoc/":Megamerge}
+Janet Malzahn (2024),  {browse "https://github.com/janetmalzahn/megamerge":Megamerge}
 
 {space 4}{hline}
 

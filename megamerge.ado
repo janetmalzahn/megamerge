@@ -82,7 +82,7 @@ Each phase of megamerge consists of the following steps
 Remarks
 -------
 
-The "m:1" and "1:m" merge options allow for duplicate observations, however, observations are only grouped together as duplicates if they match on last, first, middle, suffix, and all provided merge variables. Observations that would be considered duplicates for later stage merges (say, on first, last, and merge variables) but differ on other relevant variables (say different middles) would not be considered separate observations from the perspective of megamerge.
+Observations are only grouped together as duplicates if they match on last, first, middle, suffix, and all provided merge variables. Observations that would be considered duplicates for later stage merges (say, on first, last, and merge variables) but differ on other relevant variables (say different middles) would not be considered separate observations from the perspective of megamerge.
 
 
 
@@ -103,11 +103,15 @@ Example(s)
 		
     performs same megamerge, but without a merge on nicknames
 
-        . megamerge state dist using data2, trywithout(dist) omitmerge(8)
-		
-	performs same megamerge, but keeps all intermediate variables
+        . megamerge state dist using data2, trywithout(dist) omitmerges(8)
+
+    performs same megamerge, but keeps all intermediate variables
 
         . megamerge state dist using data2, trywithout(dist) messy
+
+    performs same megamerge, but shows detailed output for each merge phase
+
+        . megamerge state dist using data2, verbose
 
 Author
 ------
@@ -119,12 +123,12 @@ jmalzahn@stanford.edu
 License
 -------
 
-Specify the license of the software
+MIT
 
 References
 ----------
 
-Janet Malzahn (2022), [Megamerge](https://github.com/haghish/markdoc/)
+Janet Malzahn (2024), [Megamerge](https://github.com/janetmalzahn/megamerge)
 
 - - -
 
