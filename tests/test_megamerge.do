@@ -176,6 +176,37 @@ program define run_megamerge_tests
     test_pass
 
     *--------------------------------------------------------------------------
+    * Test 9: Hyphen-space normalization allows cross-matching
+    *--------------------------------------------------------------------------
+    test_begin "hyphen_space_normalization"
+
+    * Use existing namevar test data which has SMITH-JONES vs SMITH JONES
+    use tests/data/namevar_master.dta, clear
+    megamerge state using tests/data/namevar_using.dta
+
+    * SMITH-JONES should match SMITH JONES (hyphen normalized to space)
+    count if first == "MARY" & merge_code < 100
+    local mary_matched = (r(N) == 1)
+    test_assert `mary_matched' "SMITH-JONES_should_match_SMITH_JONES"
+
+    test_pass
+
+    *--------------------------------------------------------------------------
+    * Test 10: Last name with single word still works
+    *--------------------------------------------------------------------------
+    test_begin "single_word_last_name"
+
+    use tests/data/simple_master.dta, clear
+    megamerge id using tests/data/simple_using.dta
+
+    * Simple last names should still match
+    count if first == "JOHN" & last == "SMITH" & merge_code == 0
+    local john_matched = (r(N) == 1)
+    test_assert `john_matched' "Single_word_last_name_should_match"
+
+    test_pass
+
+    *--------------------------------------------------------------------------
     * Summary
     *--------------------------------------------------------------------------
     di as text _n "============================================"

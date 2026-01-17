@@ -51,12 +51,10 @@ Merge Codes
 | 2              | merge vars + first + last + middle                                        |
 | 3              | merge vars + first + last + middle initial                                |
 | 4              | merge vars + first + last                                                 |
-| 5              | merge vars + last word of last name + first                               |
-| 6              | merge vars + first word of last name + first                              |
+| 5              | merge vars + last word of last name + first (hyphens normalized to spaces) |
+| 6              | merge vars + first word of last name + first (hyphens normalized to spaces)|
 | 7              | merge vars + last + initial                                               |
 | 8              | merge vars + last + first names standardized for common nicknames         |
-| 9              | merge vars + last + first part of hyphenated last name + first initial    |
-| 10             | merge vars + second part of hyphenated last name + first initial          |
 | 11             | merge vars + last name without any spaces or hyphens                      |
 | 12             | merge vars + middle appended to last name (no spaces), middlelast         |
 | 13             | merge vars + last name appended to middle (no spaces), lastmiddle         |
@@ -297,13 +295,13 @@ if "`keepmerges'" != ""{
 }
 * if no keepmerges, omit omitmerges contents if sepcified
 else if "`omitmerges'" != ""{
-	numlist "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15"
+	numlist "0 1 2 3 4 5 6 7 8 11 12 13 14 15"
 	local my_list `r(numlist)'
 	local included_merges : list my_list - omitmerges
 }
 * if neither option is specified, do all merges
 else{
-	numlist "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15"
+	numlist "0 1 2 3 4 5 6 7 8 11 12 13 14 15"
 	local included_merges `r(numlist)'
 }
 
@@ -312,7 +310,7 @@ else{
 *****************************
 
 * drop initial variables
-`quiet_prefix' checkdrop merge_code merge _merge matched initial last1 last2 last3 last4 last_last hyphen hyphen1 hyphen2 hyphen3 hyphen_parts, dataset(using)
+`quiet_prefix' checkdrop merge_code merge _merge matched initial last1 last_last, dataset(master)
 
 
 * get list of variables originally present in master
@@ -342,25 +340,12 @@ if "`verbose'" != "" {
 `quiet_prefix' capture gen middle_init = substr(middle,1,1)
 
 
-* get parts of last name
-`quiet_prefix' split last, gen(last)
-`quiet_prefix' gen last_parts = length(last) - length(subinstr(last, " ", "", .)) + 1
-quietly summarize(last_parts)
-local n `r(max)'
-`quiet_prefix' gen last_last = last1
-`quiet_prefix' forvalues x = 1/`n'{
-	replace last_last = last`x' if last`x' != ""
-}
+* normalize hyphens to spaces in last name for consistent matching
+`quiet_prefix' replace last = subinstr(last, "-", " ", .)
 
-* gets hyphen parts of lastname
-`quiet_prefix' split last, parse("-") generate(hyphen)
-`quiet_prefix' gen hyphen_parts = length(last) - length(subinstr(last, "-", "", .)) + 1
-quietly summarize(hyphen_parts)
-local n `r(max)'
-`quiet_prefix' gen hyphen_last = hyphen1
-`quiet_prefix' forvalues x = 1/`n'{
-	replace hyphen_last = hyphen`x' if hyphen`x' != ""
-}
+* get first and last words of last name
+`quiet_prefix' gen last1 = word(last, 1)
+`quiet_prefix' gen last_last = word(last, wordcount(last))
 
 /* FOR FUTURE USE
 * handle m:1 option
@@ -398,7 +383,7 @@ tempfile master_merge_unmatched
 `quiet_prefix' use `using', clear
 
 * List of variables to check
-`quiet_prefix' checkdrop merge_code merge matched initial last1 last2 last3 last4 last_last hyphen hyphen1 hyphen2 hyphen3 hyphen_parts, dataset(using)
+`quiet_prefix' checkdrop merge_code merge matched initial last1 last_last, dataset(using)
 
 * get list of variables originally present in using
 `quiet_prefix' describe, varlist
@@ -419,25 +404,12 @@ local usingvars = "`r(varlist)'"
 * gen middle initial
 `quiet_prefix' capture gen middle_init = substr(middle,1,1)
 
-* get parts of last name
-`quiet_prefix' split last, gen(last)
-`quiet_prefix' gen last_parts = length(last) - length(subinstr(last, " ", "", .)) + 1
-quietly summarize(last_parts)
-local n `r(max)'
-`quiet_prefix' gen last_last = last1
-`quiet_prefix' forvalues x = 1/`n'{
-	replace last_last = last`x' if last`x' != ""
-}
+* normalize hyphens to spaces in last name for consistent matching
+`quiet_prefix' replace last = subinstr(last, "-", " ", .)
 
-* gets hyphen parts of lastname
-`quiet_prefix' split last, parse("-") generate(hyphen)
-`quiet_prefix' gen hyphen_parts = length(last) - length(subinstr(last, "-", "", .)) + 1
-quietly summarize(hyphen_parts)
-local n `r(max)'
-`quiet_prefix' gen hyphen_last = hyphen1
-`quiet_prefix' forvalues x = 1/`n'{
-	replace hyphen_last = hyphen`x' if hyphen`x' != ""
-}
+* get first and last words of last name
+`quiet_prefix' gen last1 = word(last, 1)
+`quiet_prefix' gen last_last = word(last, wordcount(last))
 
 /* FOR FUTURE USE
 * handle 1:m option
@@ -552,12 +524,6 @@ foreach i in `included_merges' {
 	}
 	else if `i' == 8 {
 		local merge_varlist "last fake_first"
-	}
-	else if `i' == 9 {
-		local merge_varlist "hyphen_last initial"
-	}
-	else if `i' == 10 {
-		local merge_varlist "hyphen1 initial"
 	}
 	else if `i' == 11 {
 		local merge_varlist "nohyphen_last initial"
@@ -690,8 +656,6 @@ if "`messy'" == ""{
 						 6 "6: vars + firstlast + first" ///
 						 7 "7: vars + last + initial" ///
 						 8 "8: vars + last + nickname" ///
-						 9 "9: vars + hyphen2 + initial" ///
-						 10 "10: vars + hypen1 + initial" ///
 						 11 "11: vars + last smooshed" ///
 						 12 "12: vars + middlelast" ///
 						 13 "13: vars + lastmiddle" ///
