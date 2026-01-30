@@ -113,4 +113,21 @@ input str20 first str20 middle str30 last str10 suffix int state float score
 end
 save tests/data/namevar_using.dta, replace
 
+* Create test data for trywithout multiple variables test
+* ALICE: same state (1), different district (10 vs 99) -> matches when district excluded
+* CHARLIE: different state (2 vs 99), same district (20) -> matches when state excluded
+clear
+input str20 first str20 middle str20 last str10 suffix int state int district
+"ALICE"    "M"  "BROWN"   ""    1   10
+"CHARLIE"  "J"  "DAVIS"   ""    2   20
+end
+save tests/data/trywithout_master.dta, replace
+
+clear
+input str20 first str20 middle str20 last str10 suffix int state int district
+"ALICE"    "M"  "BROWN"   ""    1   99
+"CHARLIE"  "J"  "DAVIS"   ""    99  20
+end
+save tests/data/trywithout_using.dta, replace
+
 di as result "Test data files created in tests/data/"

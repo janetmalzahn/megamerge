@@ -1,0 +1,9 @@
+# Claude Code project notes
+CLAUDE.md
+
+# macOS
+.DS_Store
+
+# Stata temporary files
+*.log
+*.smcl

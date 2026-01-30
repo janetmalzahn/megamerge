@@ -211,26 +211,11 @@ program define run_megamerge_tests
     *--------------------------------------------------------------------------
     test_begin "trywithout_multiple_vars"
 
-    * Create test data with two merge variables where trywithout is useful
-    clear
-    input str10 first str10 last str10 middle str10 suffix int state int district
-    "ALICE" "BROWN" "M" "" 1 10
-    "CHARLIE" "DAVIS" "J" "" 2 20
-    end
-    tempfile tw_master
-    save `tw_master'
-
-    clear
-    input str10 first str10 last str10 middle str10 suffix int state int district
-    "ALICE" "BROWN" "M" "" 1 99
-    "CHARLIE" "DAVIS" "J" "" 99 20
-    end
-    tempfile tw_using
-    save `tw_using'
-
-    * Load master and run megamerge with multiple trywithout variables
-    use `tw_master', clear
-    megamerge state district using `tw_using', trywithout(state district)
+    * Load test data for trywithout multiple variables
+    * ALICE: same state (1), different district (10 vs 99) -> matches when district excluded
+    * CHARLIE: different state (2 vs 99), same district (20) -> matches when state excluded
+    use tests/data/trywithout_master.dta, clear
+    megamerge state district using tests/data/trywithout_using.dta, trywithout(state district)
 
     * ALICE should match when district is excluded (state matches, district differs)
     count if first == "ALICE" & merge_code == 15

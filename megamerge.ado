@@ -1,5 +1,5 @@
 /***
-_version 1.50_ 
+_version 1.51_ 
 
 megamerge
 ===== 
@@ -559,7 +559,7 @@ foreach i in `included_merges' {
 	* handle trywithout option
 	else if `i' == 15{
 		if "`trywithout'" != "" {
-			foreach item in `trywithout'{
+			foreach item of local trywithout {
 				local tempvarlist : list varlist - item // get og varlist minus trywithout var
 				`quiet_prefix' minimerge `tempvarlist', extravars(last first) replace(`replace') ///
 					merge_code(`i') using_merge_unmatched(`using_merge_unmatched')  ///
