@@ -6,7 +6,7 @@
 make megamerge, replace toc pkg  version(1.41)                                ///
      license("MIT")                                                          ///
      author("Janet Malzahn")                                                 ///
-     affiliation("Stanford Institute for Economic Policy Research")          ///
+     affiliation("Stanford Graduate School of Business")          ///
      email("jmalzahn@stanford.edu")                                          ///
      url("")                                                                 ///
      title("megamerge")                                                      ///
