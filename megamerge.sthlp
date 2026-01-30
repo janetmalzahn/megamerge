@@ -14,7 +14,7 @@
 
 {col 5}{it:options}{col 37}{it:Description}
 {space 4}{hline}
-{col 5}{bf:trywithout({it:var})}{col 37}try merge without included variable
+{col 5}{bf:trywithout({it:varlist})}{col 37}try merge without included variable(s)
 {col 5}{bf:messy}{col 37}keep intermediate variables created by megamerge
 {col 5}{bf:omitmerges({it:merge_codes})}{col 37}do not perform the merges corresponding to the listed codes
 {col 5}{bf:keepmerges({it:merge_codes})}{col 37}perform only the merges corresponding to the listed codes
@@ -34,7 +34,7 @@ Each merge is in decreasing levels of specificity, so observations are matched o
 {title:Options}
 
 {p 4 4 2}
-{bf:trywithout({it:var})} runs one iteration of the merge without the specificed variable. The variable given the this option must be contained in the varlist given originally to megamerge. 
+{bf:trywithout({it:varlist})} runs one or more iterations of the merge, each excluding one of the specified variables. Each variable given to this option must be contained in the varlist given originally to megamerge. When multiple variables are specified (e.g., trywithout(state district)), separate merge attempts are made excluding each variable sequentially. 
 
 {p 4 4 2}
 {bf:messy} specifies that all variables created by megamerge (and all from using not of interest) be kept. By default, megamerge keeps the variables originally in master and using.
@@ -69,7 +69,7 @@ Each merge is in decreasing levels of specificity, so observations are matched o
 {col 5}12{col 21}merge vars + middle appended to last name (no spaces), middlelast
 {col 5}13{col 21}merge vars + last name appended to middle (no spaces), lastmiddle
 {col 5}14{col 21}merge vars + last
-{col 5}15{col 21}merge vars except for var specified in trywithout option + last + first
+{col 5}15{col 21}merge vars except for var(s) specified in trywithout option + last + first
 {col 5}100{col 21}unmatched observations from master data
 {col 5}101{col 21}omitted duplicate observations from master data (unmatched)
 {col 5}200{col 21}unmatched observations from using data
@@ -106,7 +106,11 @@ The "m:1" and "1:m" merge options allow for duplicate observations, however, obs
     performs same megamerge, but tries a round without the district variable
 
         . megamerge state dist using data2, trywithout(dist)
-		
+
+    performs same megamerge, but tries rounds without state and without district
+
+        . megamerge state dist using data2, trywithout(state dist)
+
     performs same megamerge, but only on last name and on last and initial
 
         . megamerge state dist using data2, trywithout(dist) keepmerges(7 14)

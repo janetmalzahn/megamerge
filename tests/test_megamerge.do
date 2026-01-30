@@ -207,6 +207,58 @@ program define run_megamerge_tests
     test_pass
 
     *--------------------------------------------------------------------------
+    * Test 11: trywithout with multiple variables
+    *--------------------------------------------------------------------------
+    test_begin "trywithout_multiple_vars"
+
+    * Create test data with two merge variables where trywithout is useful
+    clear
+    input str10 first str10 last str10 middle str10 suffix int state int district
+    "ALICE" "BROWN" "M" "" 1 10
+    "CHARLIE" "DAVIS" "J" "" 2 20
+    end
+    tempfile tw_master
+    save `tw_master'
+
+    clear
+    input str10 first str10 last str10 middle str10 suffix int state int district
+    "ALICE" "BROWN" "M" "" 1 99
+    "CHARLIE" "DAVIS" "J" "" 99 20
+    end
+    tempfile tw_using
+    save `tw_using'
+
+    * Load master and run megamerge with multiple trywithout variables
+    use `tw_master', clear
+    megamerge state district using `tw_using', trywithout(state district)
+
+    * ALICE should match when district is excluded (state matches, district differs)
+    count if first == "ALICE" & merge_code == 15
+    local alice_matched = (r(N) == 1)
+    test_assert `alice_matched' "ALICE_should_match_with_trywithout_district"
+
+    * CHARLIE should match when state is excluded (district matches, state differs)
+    count if first == "CHARLIE" & merge_code == 15
+    local charlie_matched = (r(N) == 1)
+    test_assert `charlie_matched' "CHARLIE_should_match_with_trywithout_state"
+
+    test_pass
+
+    *--------------------------------------------------------------------------
+    * Test 12: trywithout with invalid variable gives error
+    *--------------------------------------------------------------------------
+    test_begin "trywithout_invalid_var_error"
+
+    use tests/data/simple_master.dta, clear
+
+    * Try with invalid variable - should error
+    capture megamerge id using tests/data/simple_using.dta, trywithout(invalid_var)
+    local got_error = (_rc == 111)
+    test_assert `got_error' "Invalid_trywithout_var_should_error"
+
+    test_pass
+
+    *--------------------------------------------------------------------------
     * Summary
     *--------------------------------------------------------------------------
     di as text _n "============================================"

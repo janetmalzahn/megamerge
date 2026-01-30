@@ -13,7 +13,7 @@ Syntax
 
 | _options_          |  _Description_          |
 |:-------------------------------|:-------------------------------------------------------------|
-| __trywithout(_var_)__          | try merge without included variable                          |
+| __trywithout(_varlist_)__      | try merge without included variable(s)                       |
 | __messy__                      | keep intermediate variables created by megamerge             |
 | __omitmerges(_merge_codes_)__  | do not perform the merges corresponding to the listed codes  |
 | __keepmerges(_merge_codes_)__  | perform only the merges corresponding to the listed codes    |
@@ -30,7 +30,7 @@ Each merge is in decreasing levels of specificity, so observations are matched o
 Options
 -------
 
-__trywithout(_var_)__ runs one iteration of the merge without the specificed variable. The variable given the this option must be contained in the varlist given originally to megamerge. 
+__trywithout(_varlist_)__ runs one or more iterations of the merge, each excluding one of the specified variables. Each variable given to this option must be contained in the varlist given originally to megamerge. When multiple variables are specified (e.g., trywithout(state district)), separate merge attempts are made excluding each variable sequentially. 
 
 __messy__ specifies that all variables created by megamerge (and all from using not of interest) be kept. By default, megamerge keeps the variables originally in master and using.
 
@@ -59,7 +59,7 @@ Merge Codes
 | 12             | merge vars + middle appended to last name (no spaces), middlelast         |
 | 13             | merge vars + last name appended to middle (no spaces), lastmiddle         |
 | 14             | merge vars + last                                                         |
-| 15             | merge vars except for var specified in trywithout option + last + first   |
+| 15             | merge vars except for var(s) specified in trywithout option + last + first |
 | 100            | unmatched observations from master data                                   |
 | 101            | omitted duplicate observations from master data (unmatched)               |
 | 200            | unmatched observations from using data                                    |
@@ -94,6 +94,10 @@ Example(s)
     performs same megamerge, but tries a round without the district variable
 
         . megamerge state dist using data2, trywithout(dist)
+
+    performs same megamerge, but tries rounds without state and without district
+
+        . megamerge state dist using data2, trywithout(state dist)
 		
     performs same megamerge, but only on last name and on last and initial
 
@@ -242,18 +246,20 @@ foreach var of local required_vars {
 
 restore
 
-* Validate trywithout option
+* Validate trywithout option (supports multiple variables)
 if "`trywithout'" != "" {
-	local tw_valid 0
-	foreach var of local varlist {
-		if "`var'" == "`trywithout'" {
-			local tw_valid 1
+	foreach tw_var of local trywithout {
+		local tw_valid 0
+		foreach var of local varlist {
+			if "`var'" == "`tw_var'" {
+				local tw_valid 1
+			}
 		}
-	}
-	if `tw_valid' == 0 {
-		di as error "Error: trywithout variable '`trywithout'' is not in the merge varlist"
-		di as error "trywithout must specify a variable from: `varlist'"
-		exit 111
+		if `tw_valid' == 0 {
+			di as error "Error: trywithout variable '`tw_var'' is not in the merge varlist"
+			di as error "trywithout must specify variables from: `varlist'"
+			exit 111
+		}
 	}
 }
 
