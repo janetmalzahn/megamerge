@@ -244,6 +244,49 @@ program define run_megamerge_tests
     test_pass
 
     *--------------------------------------------------------------------------
+    * Test 13: Preexisting fake_first does not break nickname merge
+    *--------------------------------------------------------------------------
+    test_begin "preexisting_fake_first"
+
+    use tests/data/simple_master.dta, clear
+    gen fake_first = "PREEXISTING"
+
+    capture megamerge id using tests/data/simple_using.dta
+    local no_error = (_rc == 0)
+    test_assert `no_error' "Preexisting_fake_first_should_not_error"
+
+    count if first == "BOB" & last == "JONES" & merge_code == 8
+    local bob_matched = (r(N) == 1)
+    test_assert `bob_matched' "BOB_should_still_match_after_fake_first_cleanup"
+
+    capture confirm variable fake_first
+    local fake_first_dropped = (_rc != 0)
+    test_assert `fake_first_dropped' "fake_first_should_not_leak_into_clean_output"
+
+    test_pass
+
+    *--------------------------------------------------------------------------
+    * Test 14: Rerunning after messy succeeds
+    *--------------------------------------------------------------------------
+    test_begin "rerun_after_messy"
+
+    use tests/data/simple_master.dta, clear
+
+    capture megamerge id using tests/data/simple_using.dta, messy
+    local first_run_ok = (_rc == 0)
+    test_assert `first_run_ok' "First_messy_run_should_succeed"
+
+    capture megamerge id using tests/data/simple_using.dta
+    local second_run_ok = (_rc == 0)
+    test_assert `second_run_ok' "Second_run_after_messy_should_succeed"
+
+    count if first == "BOB" & last == "JONES" & merge_code == 8
+    local bob_rerun_matched = (r(N) == 1)
+    test_assert `bob_rerun_matched' "BOB_should_match_on_rerun_after_messy"
+
+    test_pass
+
+    *--------------------------------------------------------------------------
     * Summary
     *--------------------------------------------------------------------------
     di as text _n "============================================"

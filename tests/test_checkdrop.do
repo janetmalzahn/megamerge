@@ -34,11 +34,19 @@ program define run_checkdrop_tests
 
     * Run checkdrop
     checkdrop y
+    local dropped_count = r(dropped_count)
+    local dropped_vars "`r(dropped_vars)'"
 
     * Verify y no longer exists
     capture confirm variable y
     local y_dropped = (_rc != 0)
     test_assert `y_dropped' "Variable_y_should_be_dropped"
+
+    local dropped_count_ok = (`dropped_count' == 1)
+    test_assert `dropped_count_ok' "Dropped_count_should_be_1"
+
+    local dropped_vars_ok = ("`dropped_vars'" == "y")
+    test_assert `dropped_vars_ok' "Dropped_vars_should_list_y"
 
     * Verify x and z still exist
     capture confirm variable x
@@ -91,6 +99,8 @@ program define run_checkdrop_tests
 
     * Drop some existing (b, d) and some non-existent (fake1, fake2)
     checkdrop b fake1 d fake2
+    local dropped_count = r(dropped_count)
+    local dropped_vars "`r(dropped_vars)'"
 
     * Verify b and d are dropped
     capture confirm variable b
@@ -109,6 +119,12 @@ program define run_checkdrop_tests
     capture confirm variable c
     local c_exists = (_rc == 0)
     test_assert `c_exists' "Variable_c_should_still_exist"
+
+    local dropped_count_ok = (`dropped_count' == 2)
+    test_assert `dropped_count_ok' "Dropped_count_should_be_2"
+
+    local dropped_vars_ok = ("`dropped_vars'" == "b d")
+    test_assert `dropped_vars_ok' "Dropped_vars_should_list_b_and_d"
 
     test_pass
 

@@ -1,5 +1,5 @@
 /***
-_version 1.51_ 
+_version 1.52_ 
 
 megamerge
 ===== 
@@ -315,12 +315,17 @@ else{
 	local included_merges `r(numlist)'
 }
 
+local generated_vars "merge_code merge _merge matched dup initial middle_init last1 last_last fake_first nohyphen_last appended_middlelast appended_lastmiddle"
+
 *****************************
 * Preclean Master
 *****************************
 
 * drop initial variables
-`quiet_prefix' checkdrop merge_code merge _merge matched initial last1 last_last, dataset(master)
+quietly checkdrop `generated_vars', dataset(master)
+if r(dropped_count) > 0 {
+	di as error _n "WARNING: megamerge dropped pre-existing internal variable(s) from master: `r(dropped_vars)'"
+}
 
 
 * get list of variables originally present in master
@@ -393,7 +398,10 @@ tempfile master_merge_unmatched
 `quiet_prefix' use `using', clear
 
 * List of variables to check
-`quiet_prefix' checkdrop merge_code merge matched initial last1 last_last, dataset(using)
+quietly checkdrop `generated_vars', dataset(using)
+if r(dropped_count) > 0 {
+	di as error _n "WARNING: megamerge dropped pre-existing internal variable(s) from using: `r(dropped_vars)'"
+}
 
 * get list of variables originally present in using
 `quiet_prefix' describe, varlist
@@ -694,4 +702,3 @@ tab matched
 
 end
 	
-

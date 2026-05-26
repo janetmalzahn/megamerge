@@ -1,6 +1,6 @@
 # megamerge
 
-_v. 1.50_
+_v. 1.52_
 
 A Stata package for exhaustive 1:1 record linkage on name variables.
 
@@ -117,6 +117,11 @@ megamerge state district using data2.dta, omitmerges(8)
 * Show detailed output for each merge phase
 megamerge state district using data2.dta, verbose
 ```
+
+## What's New in v1.52
+
+- **Internal variable safety** - `megamerge` now cleans up stale helper variables like `fake_first` safely before reuse
+- **Visible warning** - A warning is shown if `megamerge` has to drop one of its pre-existing internal helper variables from master or using data
 
 ## What's New in v1.50
 

@@ -1,6 +1,7 @@
 capture program drop replace_nicknames
 program define replace_nicknames 
 	* replace initials for nicknames in using data
+	capture drop fake_first
 	gen fake_first = first
 	replace fake_first = "ROBERT" if inlist(first, "ROB", "BOB", "BOBBY", "ROBBIE", "ROBBY", "BOBBIE", "ROBERTA", "BERT") // Robert
 	replace fake_first = "RICHARD" if inlist(first, "DICK", "RICHIE", "RICH", "RICHY", "RICK") // Richard

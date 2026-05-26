@@ -33,27 +33,33 @@ if _N == 0{
 if strpos("`extravars'", "nohyphen_last") > 0{
 	di "nohyphen"
 	* make hyphenless last
+	capture drop nohyphen_last
 	gen nohyphen_last = subinstr(last,"-","",.)
 	replace nohyphen_last = subinstr(nohyphen_last," ","",.)
 }
 
 if strpos("`extravars'", "fake_first") > 0{
 	di "nickname"
+	capture drop fake_first
 	replace_nicknames
 }
 
 
 if strpos("`extravars'", "appended_middlelast") > 0{
 	* make appended last of last + middle
-	capture gen nohyphen_last = subinstr(last,"-","",.)
-	capture replace nohyphen_last = subinstr(nohyphen_last," ","",.)
+	capture drop appended_middlelast
+	capture drop nohyphen_last
+	gen nohyphen_last = subinstr(last,"-","",.)
+	replace nohyphen_last = subinstr(nohyphen_last," ","",.)
 	gen appended_middlelast = cond(length(middle)>2,middle + nohyphen_last,nohyphen_last)
 }
 
 if strpos("`extravars'", "appended_lastmiddle") > 0{
 	* make appended last of middle + last
-	capture gen nohyphen_last = subinstr(last,"-","",.)
-	capture replace nohyphen_last = subinstr(nohyphen_last," ","",.)
+	capture drop appended_lastmiddle
+	capture drop nohyphen_last
+	gen nohyphen_last = subinstr(last,"-","",.)
+	replace nohyphen_last = subinstr(nohyphen_last," ","",.)
 	gen appended_lastmiddle = cond(length(middle)>2,nohyphen_last+middle,nohyphen_last)
 }
 
@@ -87,27 +93,33 @@ if _N == 0{
 if strpos("`extravars'", "nohyphen_last") > 0{
 	di "nohyphen"
 	* make hyphenless last
+	capture drop nohyphen_last
 	gen nohyphen_last = subinstr(last,"-","",.)
 	replace nohyphen_last = subinstr(nohyphen_last," ","",.)
 }
 
 if strpos("`extravars'", "fake_first") > 0{
 	di "nickname"
+	capture drop fake_first
 	replace_nicknames
 }
 
 
 if strpos("`extravars'", "appended_middlelast") > 0{
 	* make appended last of last + middle
-	capture gen nohyphen_last = subinstr(last,"-","",.)
-	capture replace nohyphen_last = subinstr(nohyphen_last," ","",.)
+	capture drop appended_middlelast
+	capture drop nohyphen_last
+	gen nohyphen_last = subinstr(last,"-","",.)
+	replace nohyphen_last = subinstr(nohyphen_last," ","",.)
 	gen appended_middlelast = cond(length(middle)>2,middle + nohyphen_last,nohyphen_last)
 }
 
 if strpos("`extravars'", "appended_lastmiddle") > 0{
 	* make appended last of middle + last
-	capture gen nohyphen_last = subinstr(last,"-","",.)
-	capture replace nohyphen_last = subinstr(nohyphen_last," ","",.)
+	capture drop appended_lastmiddle
+	capture drop nohyphen_last
+	gen nohyphen_last = subinstr(last,"-","",.)
+	replace nohyphen_last = subinstr(nohyphen_last," ","",.)
 	gen appended_lastmiddle = cond(length(middle)>2,nohyphen_last+middle,nohyphen_last)
 }
 

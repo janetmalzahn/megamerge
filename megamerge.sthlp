@@ -1,5 +1,5 @@
 {smcl}
-{it:version 1.51} 
+{it:version 1.52} 
 
 
 {title:megamerge}
@@ -152,5 +152,4 @@ Janet Malzahn (2024),  {browse "https://github.com/janetmalzahn/megamerge":Megam
 {p 4 4 2}
 This help file was dynamically produced by 
 {browse "http://www.haghish.com/markdoc/":MarkDoc Literate Programming package} 
-
 
